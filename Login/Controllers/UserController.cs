@@ -67,7 +67,7 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
-            this.user = new Benutzer();
+            Benutzer user = new Benutzer();
             user.email = HttpContext.User.Identity.Name;
 
             string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
