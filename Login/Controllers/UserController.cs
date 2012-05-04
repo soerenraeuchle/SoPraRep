@@ -14,10 +14,7 @@ namespace Login.Controllers
     /// </summary>
     public class UserController : Controller
     {
-        Benutzer user;
         DBManager DB = DBManager.getInstanz();
-
-
 
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
@@ -99,7 +96,7 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult KontoBearbeiten()
         {
-            this.user = new Benutzer();
+            Benutzer user = new Benutzer();
             user.email = HttpContext.User.Identity.Name;
 
             string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
