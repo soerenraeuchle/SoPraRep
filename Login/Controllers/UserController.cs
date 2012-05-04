@@ -178,9 +178,12 @@ namespace Login.Controllers
                         return RedirectToAction("index", "User");
                     }
                     {
-                        ModelState.AddModelError("", "Falsche A eingabe");
+                        ModelState.AddModelError("", "Falsche A1 eingabe");
                     }
 
+                }
+                {
+                    ModelState.AddModelError("", "Falsche A2 eingabe");
                 }
                 reader.Close();
             }
