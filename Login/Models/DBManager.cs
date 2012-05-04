@@ -53,10 +53,12 @@ namespace Login.Models
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
             catch (InvalidOperationException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
         }
@@ -81,10 +83,12 @@ namespace Login.Models
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
             catch (InvalidOperationException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
         }
