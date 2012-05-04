@@ -8,3 +8,13 @@ D:\HiWiBoerse\Login\bin\WebActivator.dll
 D:\HiWiBoerse\Login\bin\EntityFramework.xml
 D:\HiWiBoerse\Login\obj\Debug\Login.dll
 D:\HiWiBoerse\Login\obj\Debug\Login.pdb
+C:\Users\netbook\Documents\SoPraRep\Login\bin\Login.dll
+C:\Users\netbook\Documents\SoPraRep\Login\bin\Login.pdb
+C:\Users\netbook\Documents\SoPraRep\Login\bin\DataAnnotationsExtensions.ClientValidation.dll
+C:\Users\netbook\Documents\SoPraRep\Login\bin\DataAnnotationsExtensions.dll
+C:\Users\netbook\Documents\SoPraRep\Login\bin\EntityFramework.dll
+C:\Users\netbook\Documents\SoPraRep\Login\bin\WebActivator.dll
+C:\Users\netbook\Documents\SoPraRep\Login\bin\EntityFramework.xml
+C:\Users\netbook\Documents\SoPraRep\Login\obj\Debug\ResolveAssemblyReference.cache
+C:\Users\netbook\Documents\SoPraRep\Login\obj\Debug\Login.dll
+C:\Users\netbook\Documents\SoPraRep\Login\obj\Debug\Login.pdb

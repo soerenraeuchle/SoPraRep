@@ -67,6 +67,9 @@
         </div>
     </div>
 
-    
+    @using (Html.BeginForm("KontoBearbeiten", "User", FormMethod.Get))
+    {
+        <input type="submit" value="Bearbeiten" />
+    }
 
 </div>
