@@ -1,0 +1,57 @@
+@model Login.Models.Login
+           
+@{ 
+    Layout = "";
+} 
+<div class="login">
+    <h2>Login</h2>
+    <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+    <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+    <script type="text/javascript">
+        $(document).ready(function () {
+            /*
+            * also jqueryUI dialog ausführen
+            */
+            $("#registerDialog").dialog({
+                autoOpen: false,
+                width: 700,
+                resizable: false,
+                title: 'Registrierung',
+                closeText: 'x',
+                modal: true,
+                open: function(event, ui) {
+                    //Load the CreateAlbumPartial action which will return 
+                    // the partial view _CreateAlbumPartial
+                    $(this).load("@Url.Action("Register")");
+                }          
+            });
+
+            $('#openRegister').button().click(function () {
+                $('#registerDialog').dialog('open');
+            });
+        });
+
+    </script>
+    @using (Html.BeginForm("Login", "User", FormMethod.Post))
+    {
+        <p>E-Mail:
+        @Html.EditorFor(Model => Model.Email)
+        @Html.ValidationMessageFor(Model => Model.Email, "*")</p>
+
+        <p>Passwort:
+        @Html.PasswordFor(Model => Model.Passwort)
+        @Html.ValidationMessageFor(Model => Model.Passwort, "*")</p>
+
+        <input type="submit" value="Anmelden" />
+        <input id="openRegister" type="button" value="Registrieren" />
+        <div id="registerDialog">
+            
+        </div>
+
+        <p>@Html.ValidationSummary()</p>
+        
+        
+    }
+
+    
+</div>

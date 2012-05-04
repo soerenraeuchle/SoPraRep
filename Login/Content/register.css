@@ -1,0 +1,63 @@
+﻿#form2, #form3, #form4 
+{
+    display: none;   
+}
+
+.register
+{
+    padding: 10px;
+}
+
+#register 
+{
+    clear: both;
+}
+
+#register h3 
+{
+    margin: 0;
+}
+
+#register .gruppe 
+{
+    padding: 10px;
+}
+
+#register .input 
+{
+    position: relative;
+    height: 40px;
+    margin: 10px;
+    display: inline-block;
+    
+}
+
+#register label 
+{
+    position: absolute;
+    top: 27px;
+    text-transform: uppercase;
+    font-size: 10px;
+    font-weight: bold;
+    color: #666;
+}
+
+#register #hausnummer, #register #plz 
+{
+    width: 50px;
+}
+
+#register #matrikelnummer 
+{
+    width: 80px;
+}
+
+#register #fachsemester 
+{
+    width: 40px;
+}
+
+#register #email 
+{
+    width: 200px;
+}

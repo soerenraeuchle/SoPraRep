@@ -1,0 +1,29 @@
+@{
+    var Stunde = @DateTime.Now.Hour;
+    var Begrüßung = "";
+    if(Stunde <= 11  && Stunde >= 5){
+        Begrüßung = "Guten Morgen";
+    }
+    else if(Stunde >= 12 && Stunde <= 20)
+    {
+       Begrüßung = "Wilkommen";
+    } else
+    {
+        Begrüßung = "Guten Abend";
+    }
+}
+<div class="login">
+@Begrüßung @HttpContext.Current.User.Identity.Name
+
+
+
+@using (Html.BeginForm("Konto", "User"))
+{
+    <input type="submit" value="Konto" />
+}
+
+@using (Html.BeginForm("Logout", "User", FormMethod.Post))
+{
+    <input type="submit" value="Abmelden" />
+}
+</div>

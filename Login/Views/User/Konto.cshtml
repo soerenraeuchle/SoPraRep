@@ -1,0 +1,72 @@
+@model Login.Models.Benutzer
+
+@{
+    ViewBag.Title = "Konto";
+}
+
+<h2>Konto</h2>
+
+<div id="kontoMain" class="konto">
+    <div id="name" class="gruppe">
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.vorname)
+            <div id="vorname">@Model.vorname</div>
+            
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.nachname)
+            <div id="nachname">@Model.nachname</div>
+
+        </div>
+    </div>
+
+    <div id="adresse" class="gruppe">
+        <h3>Adresse</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.strasse)
+            <div id="strasse">@Model.strasse</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.hausnummer)
+            <div id="hausnummer">@Model.hausnummer</div>
+        </div>
+
+        <br />
+
+        <div class="input">
+            @Html.LabelFor(model => model.plz)
+            <div id="plz">@Model.plz</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.wohnort)
+            <div id="wohnort">@Model.wohnort</div>
+        </div>
+
+                
+    </div>
+
+    <div id="uni" class="gruppe">
+        <h3>Identifikation</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.matrikelnummer)
+            <div id="matrikelnummer">@Model.matrikelnummer</div>
+        </div>
+                
+        <div class="input">
+            @Html.LabelFor(model => model.studiengang)
+            <div id="studiengang">@Model.studiengang</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.fachsemester)
+            <div id="fachsemester">@Model.fachsemester</div>
+        </div>
+    </div>
+
+    
+
+</div>
