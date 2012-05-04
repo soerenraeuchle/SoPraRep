@@ -167,25 +167,26 @@ namespace Login.Controllers
                 string query = "SELECT passwort FROM Benutzer WHERE email='" + user.Email + "'";
                 SqlDataReader reader = DB.auslesen(query);
                 reader.Read();
-                string pw = reader.GetValue(0).ToString();
 
-                if (password == pw)
+                if (reader.HasRows)
                 {
-                    FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                    string pw = reader.GetValue(0).ToString();
 
-                    reader.Close();
-                    return RedirectToAction("index", "User");
+                    if (password == pw)
+                    {
+                        FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+
+                        reader.Close();
+                        return RedirectToAction("index", "User");
+                    }
+                    
                 }
-                else
-                { // falsches passwort
-
+                {
+                    ModelState.AddModelError("", "Falscher Benutzer oder Passwort");
                 }
                 reader.Close();
             }
-            else
-            {
-                ModelState.AddModelError("", "Falsche eingabe");
-            }
+
             return View("index");
         }
 
