@@ -56,7 +56,8 @@ namespace Login.Controllers
                                 "(" +
                                     "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
                                     model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
-            FormsAuthentication.SetAuthCookie(user.email, false); 
+            
+            FormsAuthentication.SetAuthCookie(model.email, false); 
             return RedirectToAction("Index");
 
         }
@@ -160,31 +161,31 @@ namespace Login.Controllers
         {
             string password = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
 
-            
-
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
                 string query = "SELECT passwort FROM Benutzer WHERE email='" + user.Email + "'";
                 SqlDataReader reader = DB.auslesen(query);
                 reader.Read();
-                string pw = reader.GetValue(0).ToString();
-
-                if (password == pw)
+                if (reader.HasRows)
                 {
-                    FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                    string pw = reader.GetValue(0).ToString();
 
-                    reader.Close();
-                    return RedirectToAction("index", "User");
-                }
-                else
-                { // falsches passwort
+                    if (password == pw)
+                    {
+                        FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
 
+                        reader.Close();
+                        return RedirectToAction("index", "User");
+                    }
+
+                    ModelState.AddModelError("", "Falsche A eingabe");
+                    
                 }
                 reader.Close();
             }
             else
             {
-                ModelState.AddModelError("", "Falsche eingabe");
+                ModelState.AddModelError("", "Falsche B eingabe");
             }
             return View("index");
         }
