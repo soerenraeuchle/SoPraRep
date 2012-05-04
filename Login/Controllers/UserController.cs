@@ -177,22 +177,18 @@ namespace Login.Controllers
                         reader.Close();
                         return RedirectToAction("index", "User");
                     }
-                    {
-                        ModelState.AddModelError("", "Falsche A1 eingabe");
-                    }
+                    
+                    ModelState.AddModelError("", "Passwort falsch");
+                    
 
                 }
+                else
                 {
-                    ModelState.AddModelError("", "Falsche A2 eingabe");
+                    ModelState.AddModelError("", "Emailadresse existiert nicht");
                 }
                 reader.Close();
             }
-            else
-            {
-                {
-                    ModelState.AddModelError("", "Falsche B eingabe");
-                }
-            }
+           
             return View("index");
         }
 
