@@ -177,15 +177,18 @@ namespace Login.Controllers
                         reader.Close();
                         return RedirectToAction("index", "User");
                     }
+                    {
+                        ModelState.AddModelError("", "Falsche A eingabe");
+                    }
 
-                    ModelState.AddModelError("", "Falsche A eingabe");
-                    
                 }
                 reader.Close();
             }
             else
             {
-                ModelState.AddModelError("", "Falsche B eingabe");
+                {
+                    ModelState.AddModelError("", "Falsche B eingabe");
+                }
             }
             return View("index");
         }
