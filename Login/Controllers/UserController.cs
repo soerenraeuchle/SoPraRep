@@ -176,19 +176,19 @@ namespace Login.Controllers
 
                 if (reader.HasRows)
                 {
-                if (password == pw)
-                {
-                    string userDataString = reader.GetValue(0).ToString() + "|" + reader.GetValue(2).ToString();
-                    FormsAuthentication.SetAuthCookie(user.Email, false);
-                    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(user.Email, false);
-                    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-                    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, userDataString);
-                    authCookie.Value = FormsAuthentication.Encrypt(newTicket);
-                    Response.Cookies.Add(authCookie);
-                     //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                    if (password == pw)
+                    {
+                        string userDataString = reader.GetValue(0).ToString() + "|" + reader.GetValue(2).ToString();
+                        FormsAuthentication.SetAuthCookie(user.Email, false);
+                        HttpCookie authCookie = FormsAuthentication.GetAuthCookie(user.Email, false);
+                        FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+                        FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, userDataString);
+                        authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+                        Response.Cookies.Add(authCookie);
+                        //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
 
-                    reader.Close();
-                    return RedirectToAction("index", "User");
+                        reader.Close();
+                        return RedirectToAction("index", "User");
                     }
                 }
                 else
