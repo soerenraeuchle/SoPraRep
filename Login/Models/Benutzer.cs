@@ -63,14 +63,6 @@ namespace Login.Models
 
         public bool freischaltung { get; set; }
 
-        
-
-        
-    }
-    //------------------------------------------------------------------------------------------
-    //---------------Anbieter-------------------------------------------------------------------
-    public class Anbieter : Benutzer
-    {
         [StringLength(50)]
         [Required]
         public string institut { get; set; }
@@ -78,18 +70,7 @@ namespace Login.Models
         [Integer]
         [Required]
         public int stellvertreterID { get; set; }
-    }
 
-    public class Bearbeiter : Benutzer
-    {
-        [StringLength(50)]
-        [Required]
-        public string institut { get; set; }
-    }
-    //------------------------------------------------------------------------------------------
-    //---------------Benutzer-------------------------------------------------------------------
-    public class Bewerber : Benutzer
-    {
         [Integer]
         [Required]
         public int matrikelnummer { get; set; }
@@ -102,14 +83,4 @@ namespace Login.Models
         [Required]
         public string fachsemester { get; set; }
     }
-
-    //------------------------------------------------------------------------------------------
-    //---------------Bearbeiter-----------------------------------------------------------------
-    public class Bearbeiter : Benutzer
-    {
-        [StringLength(50)]
-        [Required]
-        public string institut { get; set; }
-    }
-
 }

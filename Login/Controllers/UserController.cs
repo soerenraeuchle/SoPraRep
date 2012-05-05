@@ -54,6 +54,7 @@ namespace Login.Controllers
                                     "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
                                     model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
             FormsAuthentication.SetAuthCookie(model.email, false); 
+            
             return RedirectToAction("Index");
 
         }

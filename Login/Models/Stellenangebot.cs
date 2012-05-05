@@ -20,7 +20,7 @@ namespace Login.Models
 
         [Required]
         [StringLength(50)]
-        public string stelllenName { get; set; }
+        public string stellenName { get; set; }
 
         [StringLength(50)]
         public string ort { get; set; }

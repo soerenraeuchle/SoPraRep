@@ -1,0 +1,18 @@
+﻿@model Login.Models.Stellenangebot
+           
+@{ 
+    Layout = "";
+} 
+
+<div class="login">
+<h2>Meine Stellenangebote</h2>
+
+
+
+@using (Html.BeginForm("NeuesStellenAngebot", "AngeboteManager", FormMethod.Get))
+{
+    <input type="submit" value="neues Stellenangebot" />
+}
+
+
+</div>
