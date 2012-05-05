@@ -22,6 +22,15 @@ namespace Login.Controllers
         /// <returns>Index.cshtml</returns>
         public ActionResult Index()
         {
+            String [] data = getUserDaten();
+            if (data != null)
+            {
+                ViewData.Add("Rolle", data[1]);
+            }
+            else
+            {
+                ViewData.Add("Rolle", 12);
+            }
             return View();
         }
 
@@ -53,8 +62,7 @@ namespace Login.Controllers
                                 "(" +
                                     "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
                                     model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
-            FormsAuthentication.SetAuthCookie(model.email, false); 
-            
+
             return RedirectToAction("Index");
 
         }
@@ -143,7 +151,6 @@ namespace Login.Controllers
                             "WHERE email='" + user.email + "'";
 
             DB.aendern(query);
-
             return RedirectToAction("Konto");
         }
 
@@ -162,29 +169,38 @@ namespace Login.Controllers
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
-                string query = "SELECT passwort FROM Benutzer WHERE email='" + user.Email + "'";
+                string query = "SELECT id, passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
                 SqlDataReader reader = DB.auslesen(query);
                 reader.Read();
+                string pw = reader.GetValue(1).ToString();
 
                 if (reader.HasRows)
                 {
-                    string pw = reader.GetValue(0).ToString();
-
-                    if (password == pw)
-                    {
-                        FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
-
-                        reader.Close();
-                        return RedirectToAction("index", "User");
-                    }
-                    
-                }
+                if (password == pw)
                 {
-                    ModelState.AddModelError("", "Falscher Benutzer oder Passwort");
+                    string userDataString = reader.GetValue(0).ToString() + "|" + reader.GetValue(2).ToString();
+                    FormsAuthentication.SetAuthCookie(user.Email, false);
+                    HttpCookie authCookie = FormsAuthentication.GetAuthCookie(user.Email, false);
+                    FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
+                    FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, userDataString);
+                    authCookie.Value = FormsAuthentication.Encrypt(newTicket);
+                    Response.Cookies.Add(authCookie);
+                     //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+
+                    reader.Close();
+                    return RedirectToAction("index", "User");
+                    }
+                }
+                else
+                { // falsches passwort
+
                 }
                 reader.Close();
             }
-
+            else
+            {
+                ModelState.AddModelError("", "Falsche eingabe");
+            }
             return View("index");
         }
 
@@ -248,6 +264,28 @@ namespace Login.Controllers
             
             DB.aendern(query);
             return true;
+        }
+
+        /// <summary>
+        /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
+        /// </summary>
+        /// <returns>string[] userDaten</returns>
+        public string[] getUserDaten()
+        {
+            FormsIdentity ident = User.Identity as FormsIdentity;
+            if (ident != null)
+            {
+                FormsAuthenticationTicket ticket = ident.Ticket;
+                string userDataString = ticket.UserData;
+
+                // string nach | teilen
+                string[] userDataPieces = userDataString.Split('|');
+                return userDataPieces;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         //TODO
