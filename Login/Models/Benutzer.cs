@@ -9,12 +9,12 @@ using System.ComponentModel.DataAnnotations;
 
 namespace Login.Models
 {
+    //------------------------------------------------------------------------------------------
+    //---------------Benutzer-------------------------------------------------------------------
     public class Benutzer
     {
         [Integer]
         public int id { get; set; }
-
-        //---------------Persönliche Daten--------------------------------------
 
         [Required]
         [StringLength(50)]
@@ -56,31 +56,31 @@ namespace Login.Models
         [StringLength(50)]
         public string confirmPasswort { get; set; }
 
-        //---------------Studium Daten--------------------------------------
-
-        [Integer]
-        public int matrikelnummer { get; set; }
-
-        [StringLength(50)]
-        public string studiengang { get; set; }
-
-        [Integer]
-        public string fachsemester { get; set; }
-
         //---------------Rechte Vergabe--------------------------------------
 
         [Integer]
         public int rechte { get; set; }
 
-        
         public bool freischaltung { get; set; }
 
-        //---------------Veranstalter relevant--------------------------------------
-
         [StringLength(50)]
+        [Required]
         public string institut { get; set; }
 
         [Integer]
+        [Required]
         public int stellvertreterID { get; set; }
+
+        [Integer]
+        [Required]
+        public int matrikelnummer { get; set; }
+
+        [StringLength(50)]
+        [Required]
+        public string studiengang { get; set; }
+
+        [Integer]
+        [Required]
+        public string fachsemester { get; set; }
     }
 }

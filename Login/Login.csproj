@@ -72,6 +72,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RegisterClientValidationExtensions.cs" />
+    <Compile Include="Controllers\AngeboteManagerController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
@@ -82,6 +83,7 @@
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\DBManager.cs" />
     <Compile Include="Models\Stellenangebot.cs" />
+    <Compile Include="Models\StellenangebotUebersicht.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -178,6 +180,15 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\User\KontoBearbeiten.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoEdit.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\AngeboteManager\NeuesStellenAngebot.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\Shared\_StellenAngebotSteuerung.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

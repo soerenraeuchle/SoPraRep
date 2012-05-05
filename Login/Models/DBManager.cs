@@ -53,10 +53,12 @@ namespace Login.Models
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
             catch (InvalidOperationException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
         }
@@ -76,15 +78,17 @@ namespace Login.Models
             SqlCommand cmd = new SqlCommand(query, con);
             try
             {
-                SqlDataReader tmp = cmd.ExecuteReader();
-                return tmp;
+                SqlDataReader reader = cmd.ExecuteReader();
+                return reader;
             }
             catch (SqlException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
             catch (InvalidOperationException e)
             {
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
         }
@@ -102,7 +106,16 @@ namespace Login.Models
         public int aendern(string query)
         {
             SqlCommand cmd = new SqlCommand(query, con);
-            return cmd.ExecuteNonQuery();
+            try
+            {
+                int affectedRows = cmd.ExecuteNonQuery();
+                return affectedRows;
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return -1;
+            }
         }
     }
 }
