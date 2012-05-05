@@ -126,7 +126,7 @@ namespace Login.Controllers
             }
             reader.Close();
 
-            return View();
+            return View("Index","User");
         }
 
 

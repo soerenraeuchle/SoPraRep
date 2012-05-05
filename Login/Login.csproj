@@ -184,10 +184,13 @@
     <Content Include="Views\User\KontoEdit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\AngeboteManager\NeuesStellenAngebot.cshtml" />
+    <Content Include="Views\Shared\_StellenAngebotSteuerung.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Shared\_StellenAngebotSteuerung.cshtml" />
+    <Content Include="Views\AngeboteManager\StellenAngebot.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
