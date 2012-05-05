@@ -83,6 +83,7 @@
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\DBManager.cs" />
     <Compile Include="Models\Stellenangebot.cs" />
+    <Compile Include="Models\StellenangebotUebersicht.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
@@ -188,6 +189,9 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\AngeboteManager\StellenAngebot.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\AngeboteManager\_StellenAngebotSteuerung.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml" />
