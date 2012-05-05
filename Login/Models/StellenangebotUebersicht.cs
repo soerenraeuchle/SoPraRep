@@ -7,11 +7,16 @@ namespace Login.Models
 {
     public class StellenangebotUebersicht
     {
-        List<Stellenangebot> angebote;
+        public LinkedList<Stellenangebot> angebote {get;set;}
 
-        public StellenangebotUebersicht(List<Stellenangebot> _angebote)
+        public StellenangebotUebersicht(LinkedList<Stellenangebot> _angebote)
         {
             this.angebote = _angebote;
+        }
+
+        public StellenangebotUebersicht()
+        {
+            angebote = null;
         }
     }
 }

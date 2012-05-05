@@ -100,17 +100,18 @@ namespace Login.Controllers
         public PartialViewResult _StellenAngebotSteuerung()
         {
             String [] userData = getUserDaten();
-            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffenerStellen, ort, vorraussetzungen" +
+            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen " +
                                                 "from Stellenangebote where anbieter = '" + userData[0] + "'");//HIER GEHTS WEITER
-            List<Stellenangebot> liste = new List<Stellenangebot>();
+            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
+            string DateFormat = "dd-MM-yyyy";
 
             while (reader.Read())
             {
-                liste.Add(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), reader.GetValue(4).ToString(), reader.GetValue(5), 
-                                             new Date(reader.GetValue(6)), reader.GetValue(7), Convert.ToInt32(reader.GetValue(8)), Convert.ToInt32(reader.GetValue(9)), reader.GetValue(10).ToString(), reader.GetValue(11).ToString()); 
+                liste.AddLast(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), reader.GetValue(4).ToString(), new Date(reader.GetDateTime(5).ToString(DateFormat)), 
+                                             new Date(reader.GetDateTime(6).ToString(DateFormat)), new Date(reader.GetDateTime(7).ToString(DateFormat)), Convert.ToInt32(reader.GetValue(8)), Convert.ToInt32(reader.GetValue(9)), reader.GetValue(10).ToString(), reader.GetValue(11).ToString())); 
             }
-            StellenangebotUebersicht angebote = new StellenangebotUebersicht();
-            return PartialView();
+            StellenangebotUebersicht angebote = new StellenangebotUebersicht(liste);
+            return PartialView(angebote);
         }
 
         /// <summary>
@@ -123,7 +124,7 @@ namespace Login.Controllers
             Stellenangebot stelle = new Stellenangebot();
 
             //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            int id = 1;
+            int id4 = 1;
 
             string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
