@@ -4,255 +4,36 @@
     ViewBag.Title = "Index";
     Layout = "";
 }
+
+<script src="@Url.Content("~/Scripts/js/verarbeiteRegNav.js")" type="text/javascript"></script>
+
+
 <div id="register">
-<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
-<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
-<script type="text/javascript">
-    $(document).ready(function () {
+
+<div class="register" id="auswahlRolle">
+    <p>Ich nutze das System um:</p>
+    @Html.RadioButtonFor(model => model.rechte, 0, new { selected = "selected" }) <span class="radioDescription">Bewerber</span>
+    @Html.RadioButtonFor(Model => Model.rechte, 1) <span class="radioDescription">Anbieter</span>
+    @Html.RadioButtonFor(Model => Model.rechte, 2) <span class="radioDescription">Bearbeiter</span>
+    <div class="button gruppe">
+        <input type="button" id="button1" value="weiter" />
+    </div>
+</div>
         
-
-
-        /*
-        * bei button2=weiter validieren, bei button4=speichern speichern
-        */
-        $("form").submit(function (event) {
-            var button = event.originalEvent.explicitOriginalTarget;
-
-            if ($(this).valid()) {
-                if (button.value == "bewerberWeiter") {
-                    $("#bewerberWeiter").css({ "display": "none" });
-                    $("#form3").css({ "display": "block" });
-                }
-                if (button.value == "anbieterWeiter") {
-                    $("#anbieterWeiter").css({ "display": "none" });
-                    $("#form3").css({ "display": "block" });
-                }
-            }
-
-        });
-
-        /* 
-        * navigiere durch die verschiedenen formularteile
-        */
-        $("#button1").click(function () {
-
-            $("#auswahlRolle").css({ "display": "none" });
-            $("#agb").css({ "display": "block" });
-
-        });
-
-
-        $("#agbZurueck").click(function () {
-            $("#auswahlRolle").css({ "display": "block" });
-            $("#agb").css({ "display": "none" });
-        });
-
-        $("#agbWeiter").click(function () {
-            $("#agb").css({ "display": "none" });
-
-            if ($("input[name='rechte']:checked").val() == 0) //Bewerber
-            {
-                $("#registerBewerber").css({ "display": "block" });
-                $("#registerAnbieter input").addClass("ignore");
-                $("#registerBewerber input").removeClass("ignore");
-
-                //$("#registerBewerber input").removeAttr('disabled');
-            }
-            else {
-                $("#registerAnbieter").css({ "display": "block" });
-                $("#registerBewerber input").addClass("ignore");
-                $("#registerAnbieter input").removeClass("ignore");
-                //$("#registerAnbieter input").removeAttr('disabled'); 
-            }
-        });
-
-
-        $("#bewerberZurueck").click(function () {
-            $("#agb").css({ "display": "block" });
-            $("#registerBewerber").css({ "display": "none" });
-        });
-
-
-        $("#anbieterZurueck").click(function () {
-            $("#agb").css({ "display": "block" });
-            $("#registerAnbieter").css({ "display": "none" });
-        });
-
-
-    });
-</script>
-
-@using (Html.BeginForm())
-{
-        @Html.ValidationSummary(true)
-
-        <div class="register" id="auswahlRolle">
-            <p>Ich nutze das System um:</p>
-            @Html.RadioButtonFor(model => model.rechte, 0, new { selected = "selected" }) <span class="radioDescription">Bewerber</span>
-            @Html.RadioButtonFor(Model => Model.rechte, 1) <span class="radioDescription">Anbieter</span>
-            @Html.RadioButtonFor(Model => Model.rechte, 2) <span class="radioDescription">Bearbeiter</span>
-            <input type="button" id="button1" value="weiter" />
-        </div>
-        
-        <div class="register" id="agb">
-            <h2>AGB</h2>
-            <input type="button" id="agbZurueck" value="zur&uuml;ck" />
-            <input type="button" id="agbWeiter" value="weiter" />
-        </div>
+<div class="register" id="agb">
+    <h2>AGB</h2>
+    <div class="button gruppe">
+        <input type="button" id="agbZurueck" value="zur&uuml;ck" />
+        <input type="button" id="agbWeiter" value="weiter" />
+    </div>
+</div>
     
-        <!--
-        ---------------------- Bewerber Formular -------------------------------------------
-        -->
-        <div class="register" id="registerBewerber">
-            <div id="bewerberName" class="gruppe">
-                <h3>Name</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.vorname)
-                    @Html.EditorFor(model => model.vorname)
-                    @Html.ValidationMessageFor(model => model.vorname)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.nachname)
-                    @Html.EditorFor(model => model.nachname)
-                    @Html.ValidationMessageFor(model => model.nachname)
-                </div>
-            </div>
-
-            <div id="bewerberAdresse" class="gruppe">
-                <h3>Adresse</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.strasse)
-                    @Html.EditorFor(model => model.strasse)
-                    @Html.ValidationMessageFor(model => model.strasse)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.hausnummer)
-                    @Html.EditorFor(model => model.hausnummer)
-                    @Html.ValidationMessageFor(model => model.hausnummer)
-                </div>
-
-                <br />
-
-                <div class="input">
-                    @Html.LabelFor(model => model.plz)
-                    @Html.EditorFor(model => model.plz)
-                    @Html.ValidationMessageFor(model => model.plz)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.wohnort)
-                    @Html.EditorFor(model => model.wohnort)
-                    @Html.ValidationMessageFor(model => model.wohnort)
-                </div>
-            </div>
-
-            <div id="bewerberUni" class="gruppe">
-                <h3>Identifikation</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.matrikelnummer)
-                    @Html.EditorFor(model => model.matrikelnummer)
-                    @Html.ValidationMessageFor(model => model.matrikelnummer)
-                </div>
-                
-                <div class="input">
-                    @Html.LabelFor(model => model.studiengang)
-                    @Html.EditorFor(model => model.studiengang)
-                    @Html.ValidationMessageFor(model => model.studiengang)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.fachsemester)
-                    @Html.EditorFor(model => model.fachsemester)
-                    @Html.ValidationMessageFor(model => model.fachsemester)
-                </div>
-            </div>
-
-            <div id="bewerberAccount" class="gruppe">
-                <h3>Account</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.email)
-                    @Html.EditorFor(model => model.email)
-                    @Html.ValidationMessageFor(model => model.email)
-                </div>
-
-                <br />
-
-                <div class="input">
-                    @Html.LabelFor(model => model.passwort)
-                    @Html.PasswordFor(model => model.passwort)
-                    @Html.ValidationMessageFor(model => model.passwort)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.confirmPasswort)
-                    @Html.PasswordFor(model => model.confirmPasswort)
-                    @Html.ValidationMessageFor(model => model.confirmPasswort)
-                </div>
-            </div>
-
-            <input type="button" id="bewerberZurueck" value="zur&uuml;ck" />
-            <input type="submit" id="bewerberWeiter" value="weiter" />
-        </div>
+<!--
+---------------------- Bewerber Formular -------------------------------------------
+-->
+<div class="register" id="registerFormular">
+</div>
     
-        
-        <!--
-        ---------------------- Anbieter Formular -------------------------------------------
-        -->
-        <div class="register" id="registerAnbieter">
-            <div id="name" class="gruppe">
-                <h3>Name</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.vorname)
-                    @Html.EditorFor(model => model.vorname)
-                    @Html.ValidationMessageFor(model => model.vorname)
-                </div>
 
-                <div class="input">
-                    @Html.LabelFor(model => model.nachname)
-                    @Html.EditorFor(model => model.nachname)
-                    @Html.ValidationMessageFor(model => model.nachname)
-                </div>
-            </div>
-
-   
-
-            <div id="uni" class="gruppe">
-                <h3>Identifikation</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.institut)
-                    @Html.EditorFor(model => model.institut)
-                    @Html.ValidationMessageFor(model => model.institut)
-                </div>
-            </div>
-
-            <div id="account" class="gruppe">
-                <h3>Account</h3>
-                <div class="input">
-                    @Html.LabelFor(model => model.email)
-                    @Html.EditorFor(model => model.email)
-                    @Html.ValidationMessageFor(model => model.email)
-                </div>
-
-                <br />
-
-                <div class="input">
-                    @Html.LabelFor(model => model.passwort)
-                    @Html.PasswordFor(model => model.passwort)
-                    @Html.ValidationMessageFor(model => model.passwort)
-                </div>
-
-                <div class="input">
-                    @Html.LabelFor(model => model.confirmPasswort)
-                    @Html.PasswordFor(model => model.confirmPasswort)
-                    @Html.ValidationMessageFor(model => model.confirmPasswort)
-                </div>
-            </div>
-
-            <input type="button" id="anbieterZurueck" value="zur&uuml;ck" />
-            <input type="submit" id="anbieterWeiter" value="weiter" />
-        </div>
-}
 
 </div>

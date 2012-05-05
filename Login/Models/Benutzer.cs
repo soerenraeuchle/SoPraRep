@@ -65,7 +65,7 @@ namespace Login.Models
         public string studiengang { get; set; }
 
         [Integer]
-        public string fachsemester { get; set; }
+        public int fachsemester { get; set; }
 
         //---------------Rechte Vergabe--------------------------------------
 
