@@ -14,7 +14,7 @@ namespace Login.Models
     public class Stellenangebot
     {
 
-        public Stellenangebot(int _id, string _stellenName, string _beschreibung, string _institut, string _anbieter,
+        public Stellenangebot(int _id, string _stellenName, string _beschreibung, string _institut, int _anbieterID,
                               Date _startAnstellung, Date _endeAnstellung, Date _bewerbungsFrist, int _monatsStunden, int _anzahlOffeneStellen,
                               string _ort, string _vorraussetzungen)
         {
@@ -26,7 +26,7 @@ namespace Login.Models
             this.monatsStunden = _monatsStunden;
             this.anzahlOffeneStellen = _anzahlOffeneStellen;
             this.institut = _institut;
-            this.anbieter = _anbieter;
+            this.anbieterID = _anbieterID;
             this.startAnstellung = _startAnstellung;
             this.endeAnstellung = _endeAnstellung;
             this.bewerbungsFrist = _bewerbungsFrist;
@@ -68,9 +68,8 @@ namespace Login.Models
         [StringLength(50)]
         public string institut { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string anbieter { get; set; }
+        [Integer]
+        public int anbieterID { get; set; }
 
         //---------------Zeitangaben--------------------------------------
 

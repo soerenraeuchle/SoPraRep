@@ -57,6 +57,8 @@ namespace Login.Controllers
             string startAnstellung = stelle.startAnstellung.getDate();
             string endeAnstellung = stelle.endeAnstellung.getDate();
             string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
+            int[] userData = getUserDaten();
+
 
             string query = "INSERT INTO " +
                                 "Stellenangebote " +
@@ -64,7 +66,7 @@ namespace Login.Controllers
                                         "stellenName, " +
                                         "beschreibung, " +
                                         "institut, " +
-                                        "anbieter, " +
+                                        "anbieterID, " +
                                         "startAnstellung, " +
                                         "endeAnstellung, " +
                                         "bewerbungsFrist, " +
@@ -77,7 +79,7 @@ namespace Login.Controllers
                                         "'" + stelle.stellenName + "', " +
                                         "'" + stelle.beschreibung + "', " +
                                         "'" + stelle.institut + "', " +
-                                        "'" + stelle.anbieter + "',' " +
+                                        "" + userData[0] + ",' " +
                                         startAnstellung + "', " +
                                         "'" + endeAnstellung + "', " +
                                         "'" + bewerbungsFrist + "', " +
@@ -99,18 +101,19 @@ namespace Login.Controllers
 
         public PartialViewResult _StellenAngebotSteuerung()
         {
-            String [] userData = getUserDaten();
-            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen " +
-                                                "from Stellenangebote where anbieter = '" + userData[0] + "'");//HIER GEHTS WEITER
+            int[] userData = getUserDaten();
+            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen " +
+                                                "from Stellenangebote where anbieterID = " + userData[0] + "");//HIER GEHTS WEITER
             LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
             string DateFormat = "dd-MM-yyyy";
 
             while (reader.Read())
             {
-                liste.AddLast(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), reader.GetValue(4).ToString(), new Date(reader.GetDateTime(5).ToString(DateFormat)), 
+                liste.AddLast(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), Convert.ToInt32(reader.GetValue(4)), new Date(reader.GetDateTime(5).ToString(DateFormat)), 
                                              new Date(reader.GetDateTime(6).ToString(DateFormat)), new Date(reader.GetDateTime(7).ToString(DateFormat)), Convert.ToInt32(reader.GetValue(8)), Convert.ToInt32(reader.GetValue(9)), reader.GetValue(10).ToString(), reader.GetValue(11).ToString())); 
             }
             StellenangebotUebersicht angebote = new StellenangebotUebersicht(liste);
+            reader.Close();
             return PartialView(angebote);
         }
 
@@ -123,20 +126,17 @@ namespace Login.Controllers
         {
             Stellenangebot stelle = new Stellenangebot();
 
-            //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            int id4 = 1;
-
-            string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
+            string query = "SELECT stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
             if (reader.HasRows)
             {
-
+                int[] userData = getUserDaten();
                 reader.Read();
                 string DateFormat = "dd-MM-yyyy";
                 stelle.stellenName = reader.GetValue(0).ToString();
                 stelle.beschreibung = reader.GetValue(1).ToString();
                 stelle.institut = reader.GetValue(2).ToString();
-                stelle.anbieter = reader.GetValue(3).ToString();
+                stelle.anbieterID = userData[0];
                 stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(DateFormat));
                 stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(DateFormat));
                 stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(DateFormat));
@@ -167,6 +167,7 @@ namespace Login.Controllers
             {
 
                 int id = stelle.id;
+                int[] userData = getUserDaten();
 
                 string startAnstellung = stelle.startAnstellung.getDate();
                 string endeAnstellung = stelle.endeAnstellung.getDate();
@@ -176,7 +177,7 @@ namespace Login.Controllers
                                     "stellenName='" + stelle.stellenName + "', " +
                                     "beschreibung='" + stelle.beschreibung + "', " +
                                     "institut='" + stelle.institut + "', " +
-                                    "anbieter='" + stelle.anbieter + "', " +
+                                    "anbieterID=" + userData[0] + ", " +
                                     "startAnstellung='" + startAnstellung + "', " +
                                     "endeAnstellung='" + endeAnstellung + "', " +
                                     "bewerbungsFrist='" + bewerbungsFrist + "', " +
@@ -218,7 +219,7 @@ namespace Login.Controllers
         /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
         /// </summary>
         /// <returns>string[] userDaten</returns>
-        public string[] getUserDaten()
+        public int[] getUserDaten()
         {
             FormsIdentity ident = User.Identity as FormsIdentity;
             if (ident != null)
@@ -227,8 +228,12 @@ namespace Login.Controllers
                 string userDataString = ticket.UserData;
 
                 // string nach | teilen
-                string[] userDataPieces = userDataString.Split('|');
-                return userDataPieces;
+                String[] userDataPieces = userDataString.Split('|');
+                int[] userData = new int[2];
+                userData[0] = Convert.ToInt32(userDataPieces[0]);
+                userData[1] = Convert.ToInt32(userDataPieces[1]);
+                
+                return userData;
             }
             else
             {

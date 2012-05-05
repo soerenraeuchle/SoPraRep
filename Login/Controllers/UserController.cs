@@ -22,7 +22,7 @@ namespace Login.Controllers
         /// <returns>Index.cshtml</returns>
         public ActionResult Index()
         {
-            String [] data = getUserDaten();
+            int[] data = getUserDaten();
             if (data != null)
             {
                 ViewData.Add("Rolle", data[1]);
@@ -270,7 +270,7 @@ namespace Login.Controllers
         /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
         /// </summary>
         /// <returns>string[] userDaten</returns>
-        public string[] getUserDaten()
+        public int[] getUserDaten()
         {
             FormsIdentity ident = User.Identity as FormsIdentity;
             if (ident != null)
@@ -279,8 +279,12 @@ namespace Login.Controllers
                 string userDataString = ticket.UserData;
 
                 // string nach | teilen
-                string[] userDataPieces = userDataString.Split('|');
-                return userDataPieces;
+                String[] userDataPieces = userDataString.Split('|');
+                int[] userData = new int[2];
+                userData[0] = Convert.ToInt32(userDataPieces[0]);
+                userData[1] = Convert.ToInt32(userDataPieces[1]);
+
+                return userData;
             }
             else
             {
