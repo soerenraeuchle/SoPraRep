@@ -22,7 +22,8 @@
       else
       {
         @Html.Partial("_BenutzerSteuerung")
-        @Html.Partial("_StellenAngebotSteuerung", new Login.Models.Stellenangebot())
+        @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
+
       }
     }
     </div>

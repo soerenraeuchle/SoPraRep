@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Login.Models;
 using System.Data.SqlClient;
+using System.Web.Security;
 
 namespace Login.Controllers
 {
@@ -85,22 +86,45 @@ namespace Login.Controllers
                                         "'" + stelle.ort + "', '" +
                                         stelle.vorraussetzungen + "')";
 
-            DB.aendern(query);
-            return true;
+            try
+            {
+                DB.aendern(query);
+                return true;
+            }
+            catch (SqlException e)
+            {
+                return false;
+            }
         }
 
+        public PartialViewResult _StellenAngebotSteuerung()
+        {
+            String [] userData = getUserDaten();
+            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen " +
+                                                "from Stellenangebote where anbieter = '" + userData[0] + "'");//HIER GEHTS WEITER
+            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
+            string DateFormat = "dd-MM-yyyy";
+
+            while (reader.Read())
+            {
+                liste.AddLast(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), reader.GetValue(4).ToString(), new Date(reader.GetDateTime(5).ToString(DateFormat)), 
+                                             new Date(reader.GetDateTime(6).ToString(DateFormat)), new Date(reader.GetDateTime(7).ToString(DateFormat)), Convert.ToInt32(reader.GetValue(8)), Convert.ToInt32(reader.GetValue(9)), reader.GetValue(10).ToString(), reader.GetValue(11).ToString())); 
+            }
+            StellenangebotUebersicht angebote = new StellenangebotUebersicht(liste);
+            return PartialView(angebote);
+        }
 
         /// <summary>
         /// Läd ein ausgewähltes Stellenangebot mithilfe einer id
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        public ActionResult StellenAngebot()
+        public ActionResult StelleBearbeiten(int id)
         {
             Stellenangebot stelle = new Stellenangebot();
 
             //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            int id = 1;
+            int id4 = 1;
 
             string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
@@ -190,6 +214,26 @@ namespace Login.Controllers
             return View();
         }
 
+        /// <summary>
+        /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
+        /// </summary>
+        /// <returns>string[] userDaten</returns>
+        public string[] getUserDaten()
+        {
+            FormsIdentity ident = User.Identity as FormsIdentity;
+            if (ident != null)
+            {
+                FormsAuthenticationTicket ticket = ident.Ticket;
+                string userDataString = ticket.UserData;
 
+                // string nach | teilen
+                string[] userDataPieces = userDataString.Split('|');
+                return userDataPieces;
+            }
+            else
+            {
+                return null;
+            }
+        }
     }
 }

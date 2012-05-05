@@ -14,6 +14,29 @@ namespace Login.Models
     public class Stellenangebot
     {
 
+        public Stellenangebot(int _id, string _stellenName, string _beschreibung, string _institut, string _anbieter,
+                              Date _startAnstellung, Date _endeAnstellung, Date _bewerbungsFrist, int _monatsStunden, int _anzahlOffeneStellen,
+                              string _ort, string _vorraussetzungen)
+        {
+            this.id = _id;
+            this.stellenName = _stellenName;
+            this.ort = _ort;
+            this.beschreibung = _beschreibung;
+            this.vorraussetzungen = _vorraussetzungen;
+            this.monatsStunden = _monatsStunden;
+            this.anzahlOffeneStellen = _anzahlOffeneStellen;
+            this.institut = _institut;
+            this.anbieter = _anbieter;
+            this.startAnstellung = _startAnstellung;
+            this.endeAnstellung = _endeAnstellung;
+            this.bewerbungsFrist = _bewerbungsFrist;
+        }
+
+        public Stellenangebot()
+        {
+            // TODO: Complete member initialization
+        }
+
         public int id { get; set; }
 
         //---------------Grunddaten Stellenangebot--------------------------------------
