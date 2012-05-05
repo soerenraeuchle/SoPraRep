@@ -16,10 +16,13 @@ namespace Login.Controllers
         DBManager DB = DBManager.getInstanz();
 
         [Authorize]
+        [HttpGet]
         public ActionResult NeuesStellenAngebot()
         {
             Stellenangebot stelle = new Stellenangebot();
-            return View(stelle);
+            ViewData.Add("Title", "Neues Stellenangebot erstellen");
+            ViewData.Add("Methode", "NeuesStellenAngebot");
+            return View("StellenangebotBearbeiten",stelle);
         }
 
         /// <summary>
@@ -31,18 +34,15 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult NeueStelleSpeichern(Stellenangebot stelle)
         {
-            string [] userDaten = getUserDaten();
-            stelle.anbieter = userDaten[0];
-            Stellenangebot neu = stelle;
+            if(ModelState.IsValid)
+            {
+                if(StelleHinzufügen(stelle))
+                {
+                    RedirectToAction("index","User");
+                }
+            }
 
-            if (StelleHinzufügen(stelle))
-            {
-                return RedirectToAction("index", "User");
-            }
-            else
-            {
-                return View("neuesStellenAngebot");
-            }
+            return View("neuesStellenAngebot");
         }
 
 
@@ -123,28 +123,29 @@ namespace Login.Controllers
             Stellenangebot stelle = new Stellenangebot();
 
             //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
+            int id = 1;
 
             string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
             if (reader.HasRows)
             {
+
                 reader.Read();
+                string DateFormat = "dd-MM-yyyy";
                 stelle.stellenName = reader.GetValue(0).ToString();
                 stelle.beschreibung = reader.GetValue(1).ToString();
                 stelle.institut = reader.GetValue(2).ToString();
                 stelle.anbieter = reader.GetValue(3).ToString();
-                stelle.startAnstellung.setDate(reader.GetInt32(4).ToString());
-                stelle.endeAnstellung.setDate(reader.GetInt32(5).ToString());
-                stelle.bewerbungsFrist.setDate(reader.GetInt32(6).ToString());
+                stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(DateFormat));
+                stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(DateFormat));
+                stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(DateFormat));
                 stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
                 stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
                 stelle.ort = reader.GetValue(9).ToString();
                 stelle.vorraussetzungen = reader.GetValue(10).ToString();
 
                 reader.Close();
-
-                return View(stelle);
+                return View("StellenAngebot", stelle);
             }
             reader.Close();
 
@@ -185,8 +186,10 @@ namespace Login.Controllers
                                 "WHERE id=" + stelle.id + "";
 
                 DB.aendern(query);
+                ViewData.Add("Title", "Stellenangebot bearbeiten");
+                ViewData.Add("Methode", "StelleBearbeiten");
 
-                return RedirectToAction("Konto");
+                return RedirectToAction("StellenAngebot");
             }
             return View();
         }
