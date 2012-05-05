@@ -1,85 +1,71 @@
 ﻿@model Login.Models.Stellenangebot
-
 @{
     ViewBag.Title = "StellenAngebot";
 }
-
 <h2>StellenAngebot</h2>
 
-<fieldset>
-    <legend>Stellenangebot</legend>
-     <div id="grunddaten" class="gruppe">
-        <h3>grunddaten</h3>
+<div id="stellenangebotMain" class="stellenangebot">
+    <div id="grunddaten" class="gruppe">
+        <h3>
+            grunddaten</h3>
         <div class="input">
             @Html.LabelFor(model => model.stellenName)
             <div id="stellenName">@Model.stellenName</div>
-            
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.ort)
             <div id="ort">@Model.ort</div>
-
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.beschreibung)
             <div id="beschreibung">@Model.beschreibung</div>
-
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.vorraussetzungen)
             <div id="vorraussetzungen">@Model.vorraussetzungen</div>
-
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.monatsStunden)
             <div id="monatsStunden">@Model.monatsStunden</div>
-
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.anzahlOffeneStellen)
             <div id="anzahlOffeneStellen">@Model.anzahlOffeneStellen</div>
-
         </div>
     </div>
 
     <div id="veranstalterdaten" class="gruppe">
-        <h3>Veranstalter</h3>
+        <h3>
+            Veranstalter</h3>
         <div class="input">
             @Html.LabelFor(model => model.institut)
             <div id="institut">@Model.institut</div>
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.anbieter)
             <div id="anbieter">@Model.anbieter</div>
         </div>
     </div>
-
     <div id="Zeitangaben" class="gruppe">
-        <h3>Zeitangaben</h3>
+        <h3>
+            Zeitangaben</h3>
         <div class="input">
             @Html.LabelFor(model => model.startAnstellung)
-            <div id="startAnstellung">@Model.startAnstellung.day . @Model.startAnstellung.month . @Model.startAnstellung.year</div>
+            <div id="startAnstellung">@Model.startAnstellung.day . @Model.startAnstellung.month
+                . @Model.startAnstellung.year</div>
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.endeAnstellung)
             <div id="endeAnstellung">@Model.endeAnstellung.day . @Model.endeAnstellung.month . @Model.endeAnstellung.year</div>
         </div>
-
         <div class="input">
             @Html.LabelFor(model => model.bewerbungsFrist)
-            <div id="bewerbungsFrist">@Model.bewerbungsFrist.day . @Model.bewerbungsFrist.month . @Model.bewerbungsFrist.year</div>
+            <div id="bewerbungsFrist">@Model.bewerbungsFrist.day . @Model.bewerbungsFrist.month
+                . @Model.bewerbungsFrist.year</div>
         </div>
     </div>
-   
-</fieldset>
+</div>
 <p>
-    @Html.ActionLink("Edit", "Edit", new { id=Model.id }) |
+    @Html.ActionLink("Edit", "Edit", new { id = Model.id }) |
     @Html.ActionLink("Back to List", "Index")
 </p>
