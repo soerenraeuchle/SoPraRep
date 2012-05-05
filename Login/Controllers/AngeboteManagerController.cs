@@ -5,7 +5,6 @@ using System.Web;
 using System.Web.Mvc;
 using Login.Models;
 using System.Data.SqlClient;
-using System.Web.Security;
 
 namespace Login.Controllers
 {
@@ -20,9 +19,7 @@ namespace Login.Controllers
         public ActionResult NeuesStellenAngebot()
         {
             Stellenangebot stelle = new Stellenangebot();
-            ViewData.Add("Title", "Neues Stellenangebot erstellen");
-            ViewData.Add("Methode", "NeuesStellenAngebot");
-            return View("StellenangebotBearbeiten",stelle);
+            return View(stelle);
         }
 
         /// <summary>
@@ -57,8 +54,6 @@ namespace Login.Controllers
             string startAnstellung = stelle.startAnstellung.getDate();
             string endeAnstellung = stelle.endeAnstellung.getDate();
             string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
-            int[] userData = getUserDaten();
-
 
             string query = "INSERT INTO " +
                                 "Stellenangebote " +
@@ -66,7 +61,7 @@ namespace Login.Controllers
                                         "stellenName, " +
                                         "beschreibung, " +
                                         "institut, " +
-                                        "anbieterID, " +
+                                        "anbieter, " +
                                         "startAnstellung, " +
                                         "endeAnstellung, " +
                                         "bewerbungsFrist, " +
@@ -126,31 +121,33 @@ namespace Login.Controllers
         {
             Stellenangebot stelle = new Stellenangebot();
 
-            string query = "SELECT stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
+            //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+            
+
+            string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
             if (reader.HasRows)
             {
-                int[] userData = getUserDaten();
                 reader.Read();
-                string DateFormat = "dd-MM-yyyy";
                 stelle.stellenName = reader.GetValue(0).ToString();
                 stelle.beschreibung = reader.GetValue(1).ToString();
                 stelle.institut = reader.GetValue(2).ToString();
-                stelle.anbieterID = userData[0];
-                stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(DateFormat));
-                stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(DateFormat));
-                stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(DateFormat));
+                stelle.anbieter = reader.GetValue(3).ToString();
+                stelle.startAnstellung.setDate(reader.GetInt32(4).ToString());
+                stelle.endeAnstellung.setDate(reader.GetInt32(5).ToString());
+                stelle.bewerbungsFrist.setDate(reader.GetInt32(6).ToString());
                 stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
                 stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
                 stelle.ort = reader.GetValue(9).ToString();
                 stelle.vorraussetzungen = reader.GetValue(10).ToString();
 
                 reader.Close();
-                return View("StellenAngebot", stelle);
+
+                return View(stelle);
             }
             reader.Close();
 
-            return View("Index","User");
+            return View();
         }
 
 
@@ -167,7 +164,6 @@ namespace Login.Controllers
             {
 
                 int id = stelle.id;
-                int[] userData = getUserDaten();
 
                 string startAnstellung = stelle.startAnstellung.getDate();
                 string endeAnstellung = stelle.endeAnstellung.getDate();
@@ -177,7 +173,7 @@ namespace Login.Controllers
                                     "stellenName='" + stelle.stellenName + "', " +
                                     "beschreibung='" + stelle.beschreibung + "', " +
                                     "institut='" + stelle.institut + "', " +
-                                    "anbieterID=" + userData[0] + ", " +
+                                    "anbieter='" + stelle.anbieter + "', " +
                                     "startAnstellung='" + startAnstellung + "', " +
                                     "endeAnstellung='" + endeAnstellung + "', " +
                                     "bewerbungsFrist='" + bewerbungsFrist + "', " +
@@ -188,10 +184,8 @@ namespace Login.Controllers
                                 "WHERE id=" + stelle.id + "";
 
                 DB.aendern(query);
-                ViewData.Add("Title", "Stellenangebot bearbeiten");
-                ViewData.Add("Methode", "StelleBearbeiten");
 
-                return RedirectToAction("StellenAngebot");
+                return RedirectToAction("Konto");
             }
             return View();
         }
@@ -215,30 +209,6 @@ namespace Login.Controllers
             return View();
         }
 
-        /// <summary>
-        /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
-        /// </summary>
-        /// <returns>string[] userDaten</returns>
-        public int[] getUserDaten()
-        {
-            FormsIdentity ident = User.Identity as FormsIdentity;
-            if (ident != null)
-            {
-                FormsAuthenticationTicket ticket = ident.Ticket;
-                string userDataString = ticket.UserData;
 
-                // string nach | teilen
-                String[] userDataPieces = userDataString.Split('|');
-                int[] userData = new int[2];
-                userData[0] = Convert.ToInt32(userDataPieces[0]);
-                userData[1] = Convert.ToInt32(userDataPieces[1]);
-                
-                return userData;
-            }
-            else
-            {
-                return null;
-            }
-        }
     }
 }
