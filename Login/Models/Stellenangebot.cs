@@ -35,6 +35,9 @@ namespace Login.Models
         public Stellenangebot()
         {
             // TODO: Complete member initialization
+            this.startAnstellung = new Date();
+            this.endeAnstellung = new Date();
+            this.bewerbungsFrist = new Date();
         }
 
         public int id { get; set; }

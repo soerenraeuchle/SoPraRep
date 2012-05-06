@@ -194,7 +194,9 @@
     <Content Include="Views\AngeboteManager\_StellenAngebotSteuerung.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml" />
+    <None Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml">
+      <SubType>Code</SubType>
+    </None>
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
