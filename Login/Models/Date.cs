@@ -23,6 +23,16 @@ namespace Login.Models
             this.year = _year;
         }
 
+        public Date(string date)
+        {
+            setDate(date);
+        }
+
+        public Date()
+        {
+            
+        }
+
         public string getDate(){
             string date = year.ToString() + "-" + month.ToString() + "-" + day.ToString();
             return date;
@@ -32,8 +42,8 @@ namespace Login.Models
         {
             string[] splitDate = date.Split('-');
             day = Convert.ToInt32(splitDate[0]);
-            month = Convert.ToInt32(splitDate[0]);
-            year = Convert.ToInt32(splitDate[0]);
+            month = Convert.ToInt32(splitDate[1]);
+            year = Convert.ToInt32(splitDate[2]);
         }
 
         

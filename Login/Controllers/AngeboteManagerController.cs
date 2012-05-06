@@ -5,6 +5,7 @@ using System.Web;
 using System.Web.Mvc;
 using Login.Models;
 using System.Data.SqlClient;
+using System.Web.Security;
 
 namespace Login.Controllers
 {
@@ -15,12 +16,14 @@ namespace Login.Controllers
         DBManager DB = DBManager.getInstanz();
 
         [Authorize]
-        [HttpGet]
         public ActionResult NeuesStellenAngebot()
         {
             Stellenangebot stelle = new Stellenangebot();
-            return View(stelle);
+            ViewData.Add("Title", "Stellenangebot erstellen");
+            ViewData.Add("Methode", "NeueStelleSpeichern");
+            return View("StellenangebotBearbeiten",stelle);
         }
+
 
         /// <summary>
         /// Die Methode "neueStelleSpeichern" speichert ein neu angelegtes Stellenangebot
@@ -33,13 +36,15 @@ namespace Login.Controllers
         {
             if(ModelState.IsValid)
             {
+                int[] userData = getUserDaten();
+                stelle.anbieterID = userData[0];
                 if(StelleHinzufügen(stelle))
                 {
-                    RedirectToAction("index","User");
+                    return RedirectToAction("Index","User");
                 }
             }
 
-            return View("neuesStellenAngebot");
+            return View();
         }
 
 
@@ -54,14 +59,13 @@ namespace Login.Controllers
             string startAnstellung = stelle.startAnstellung.getDate();
             string endeAnstellung = stelle.endeAnstellung.getDate();
             string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
-
             string query = "INSERT INTO " +
                                 "Stellenangebote " +
                                     "(" +
                                         "stellenName, " +
                                         "beschreibung, " +
                                         "institut, " +
-                                        "anbieter, " +
+                                        "anbieterID, " +
                                         "startAnstellung, " +
                                         "endeAnstellung, " +
                                         "bewerbungsFrist, " +
@@ -74,7 +78,7 @@ namespace Login.Controllers
                                         "'" + stelle.stellenName + "', " +
                                         "'" + stelle.beschreibung + "', " +
                                         "'" + stelle.institut + "', " +
-                                        "" + userData[0] + ",' " +
+                                        "" + stelle.anbieterID + ",' " +
                                         startAnstellung + "', " +
                                         "'" + endeAnstellung + "', " +
                                         "'" + bewerbungsFrist + "', " +
@@ -117,33 +121,42 @@ namespace Login.Controllers
         /// </summary>
         /// <returns></returns>
         [Authorize]
-        public ActionResult StelleBearbeiten(int id)
+        [HttpPost]
+        public ActionResult GetStelleAngebot(int id, string view)
         {
             Stellenangebot stelle = new Stellenangebot();
 
-            //StellenID muss hier definiert werden!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-            
-
-            string query = "SELECT stellenName, beschreibung, institut, anbieter, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
+            string query = "SELECT stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
             SqlDataReader reader = DB.auslesen(query);
             if (reader.HasRows)
             {
+                int[] userdata = getUserDaten();
+                string dateformat = "dd-MM-yyyy";
                 reader.Read();
                 stelle.stellenName = reader.GetValue(0).ToString();
                 stelle.beschreibung = reader.GetValue(1).ToString();
                 stelle.institut = reader.GetValue(2).ToString();
-                stelle.anbieter = reader.GetValue(3).ToString();
-                stelle.startAnstellung.setDate(reader.GetInt32(4).ToString());
-                stelle.endeAnstellung.setDate(reader.GetInt32(5).ToString());
-                stelle.bewerbungsFrist.setDate(reader.GetInt32(6).ToString());
+                stelle.anbieterID = Convert.ToInt32(reader.GetValue(3));
+                stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
+                stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
+                stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
                 stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
                 stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
                 stelle.ort = reader.GetValue(9).ToString();
                 stelle.vorraussetzungen = reader.GetValue(10).ToString();
-
+                stelle.id = id;
                 reader.Close();
-
-                return View(stelle);
+                
+                ViewData.Add("Title", "Stellenangebot bearbeiten");
+                ViewData.Add("Methode", "StelleAktualisieren");
+                if (view == "anzeigen")
+                {
+                    return View("StellenAngebot", stelle);
+                }
+                else
+                {
+                    return View("StellenangebotBearbeiten", stelle);
+                }
             }
             reader.Close();
 
@@ -158,13 +171,11 @@ namespace Login.Controllers
         /// <returns></returns>
         [HttpPost]
         [Authorize]
-        public ActionResult StelleBearbeiten(Stellenangebot stelle)
+        public ActionResult StelleAktualisieren(Stellenangebot stelle)
         {
             if (ModelState.IsValid)
             {
-
-                int id = stelle.id;
-
+                int[] userData = getUserDaten();
                 string startAnstellung = stelle.startAnstellung.getDate();
                 string endeAnstellung = stelle.endeAnstellung.getDate();
                 string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
@@ -173,21 +184,21 @@ namespace Login.Controllers
                                     "stellenName='" + stelle.stellenName + "', " +
                                     "beschreibung='" + stelle.beschreibung + "', " +
                                     "institut='" + stelle.institut + "', " +
-                                    "anbieter='" + stelle.anbieter + "', " +
+                                    "anbieterID=" + userData[0] + ", " +
                                     "startAnstellung='" + startAnstellung + "', " +
                                     "endeAnstellung='" + endeAnstellung + "', " +
                                     "bewerbungsFrist='" + bewerbungsFrist + "', " +
                                     "monatsStunden=" + stelle.monatsStunden + ", " +
                                     "anzahlOffeneStellen=" + stelle.anzahlOffeneStellen + ", " +
-                                    "ort='" + stelle.ort + "' " +
+                                    "ort='" + stelle.ort + "', " +
                                     "vorraussetzungen='" + stelle.vorraussetzungen + "' " +
                                 "WHERE id=" + stelle.id + "";
 
                 DB.aendern(query);
 
-                return RedirectToAction("Konto");
+                return View("Stellenangebot", stelle);
             }
-            return View();
+            return View("StellenangebotBearbeiten",stelle);
         }
 
 
@@ -207,6 +218,28 @@ namespace Login.Controllers
             DB.aendern(query);
 
             return View();
+        }
+
+        public int[] getUserDaten()
+        {
+            FormsIdentity ident = User.Identity as FormsIdentity;
+            if (ident != null)
+            {
+                FormsAuthenticationTicket ticket = ident.Ticket;
+                string userDataString = ticket.UserData;
+
+                // string nach | teilen
+                String[] userDataPieces = userDataString.Split('|');
+                int[] userData = new int[2];
+                userData[0] = Convert.ToInt32(userDataPieces[0]);
+                userData[1] = Convert.ToInt32(userDataPieces[1]);
+
+                return userData;
+            }
+            else
+            {
+                return null;
+            }
         }
 
 
