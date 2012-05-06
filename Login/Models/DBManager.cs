@@ -100,19 +100,23 @@ namespace Login.Models
                 if (!connect()) return null;
                 SqlCommand cmd = new SqlCommand(query, con);
                 SqlDataReader reader = cmd.ExecuteReader();
-                while(reader.Read()) {
-                    int columns = reader.FieldCount;
-
-                    ArrayList data = new ArrayList();
-
-                    for (int i = 0; i < columns; i++)
+                if (reader.HasRows)
+                {
+                    while(reader.Read()) 
                     {
-                        var tmp = reader.GetValue(i);
-                        data.Add(tmp);
+                        int columns = reader.FieldCount;
+
+                        ArrayList data = new ArrayList();
+
+                        for (int i = 0; i < columns; i++)
+                        {
+                            var tmp = reader.GetValue(i);
+                            data.Add(tmp);
+                        }
+
+                        daten.Add(data);
+
                     }
-
-                    daten.Add(data);
-
                 }
                 reader.Close();
 

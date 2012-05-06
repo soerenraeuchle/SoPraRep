@@ -16,7 +16,7 @@ namespace Login.Controllers
     public class UserController : Controller
     {
         DBManager DB = DBManager.getInstanz();
-
+        
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
         /// </summary>
@@ -81,6 +81,21 @@ namespace Login.Controllers
             }
         }
 
+
+        public JsonResult EmailVorhanden(string email)
+        {
+            string query = "SELECT id FROM Benutzer WHERE email='" + email + "'";
+
+            ArrayList daten = DB.auslesen(query);
+
+            if (daten.Count>0)
+            {
+                return Json("Email schon vorhanden", JsonRequestBehavior.AllowGet);
+            }
+            return Json(true, JsonRequestBehavior.AllowGet);
+
+        }
+
         
         /// <summary>
         /// ruft die Kontodaten des eingeloggten Benutzers ab und gibt sie auf der
@@ -90,22 +105,43 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
-            string email = HttpContext.User.Identity.Name;
-            Benutzer benutzer = GetBenutzerByEmail(email);
+            //string email = HttpContext.User.Identity.Name;
+            Benutzer benutzer = GetSessionBenutzer();
+            if (benutzer.rechte == 0)
+            {
+                return RedirectToAction("KontoBewerber");
+            }
+            else
+            {
+                return RedirectToAction("KontoAnbieter");
+            }
+        }
 
+
+        [Authorize]
+        public ActionResult KontoBewerber()
+        {
+            Benutzer benutzer = GetSessionBenutzer();
             return View(benutzer);
         }
 
+
+        [Authorize]
+        public ActionResult KontoAnbieter()
+        {
+            Benutzer benutzer = GetSessionBenutzer();
+            return View(benutzer);
+        }
 
         /// <summary>
         /// zeigt das Kontoformular an auf der die Benutzerdaten verändert werden können
         /// </summary>
         /// <returns>KontoBearbeiten.cshtml</returns>
-        [Authorize]
+        [Authorize(Roles = "Anbieter")]
         public ActionResult KontoBearbeiten()
         {
-            string email = HttpContext.User.Identity.Name;
-            Benutzer benutzer = GetBenutzerByEmail(email);
+            //string email = HttpContext.User.Identity.Name;
+            Benutzer benutzer = GetSessionBenutzer();
 
             return View(benutzer);
         }
@@ -117,7 +153,7 @@ namespace Login.Controllers
         /// <param name="user">Benutzer model</param>
         /// <returns>Konto.cshtml</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles="Anbieter")]
         public ActionResult KontoBearbeiten(Benutzer user)
         {
             user.email = HttpContext.User.Identity.Name;
@@ -148,11 +184,11 @@ namespace Login.Controllers
         [HttpPost]
         public ActionResult Login(Login.Models.Login user)
         {
-            string password = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
+            user.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
-                string query = "SELECT passwort FROM Benutzer WHERE email='" + user.Email + "'";
+                string query = "SELECT passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
                 ArrayList daten = DB.auslesen(query);
                 if (daten == null)
                 {
@@ -164,10 +200,16 @@ namespace Login.Controllers
                     ArrayList zeile = (ArrayList)daten[0];
 
                     string pw = (string)zeile[0];
+                    int rechte = (int)zeile[1];
 
-                    if (password == pw)
+                    if (user.Passwort == pw)
                     {
                         FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        Benutzer benutzer = new Benutzer();
+                        benutzer.email = user.Email;
+                        benutzer.passwort = user.Passwort;
+                        benutzer.rechte = rechte;
+                        HttpContext.Session["benutzer"] = benutzer;
 
                         return RedirectToAction("index", "User");
                     }
@@ -298,22 +340,39 @@ namespace Login.Controllers
         }
 
         //TODO
-        private Benutzer GetBenutzerByEmail(string email)
+        [Authorize]
+        private Benutzer GetSessionBenutzer()
         {
             Benutzer user = new Benutzer();
-            user.email = email;
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
+            user = (Benutzer)HttpContext.Session["benutzer"];
+
+            string query;
+            if (user.rechte == 0)
+            {
+                query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
+            }
+            else
+            {
+                query = "SELECT vorname, nachname, institut FROM Benutzer WHERE email='" + user.email + "'";
+            }
             ArrayList daten = DB.auslesen(query);
             ArrayList zeile = (ArrayList)daten[0];
             user.vorname = (string)zeile[0];
             user.nachname = (string)zeile[1];
-            user.strasse = (string)zeile[2];
-            user.hausnummer = (string)zeile[3];
-            user.plz = (int)zeile[4];
-            user.wohnort = (string)zeile[5];
-            user.matrikelnummer = (int)zeile[6];
-            user.studiengang = (string)zeile[7];
-            user.fachsemester = (int)zeile[8];
+            if (user.rechte == 0)
+            {
+                user.strasse = (string)zeile[2];
+                user.hausnummer = (string)zeile[3];
+                user.plz = (int)zeile[4];
+                user.wohnort = (string)zeile[5];
+                user.matrikelnummer = (int)zeile[6];
+                user.studiengang = (string)zeile[7];
+                user.fachsemester = (int)zeile[8];
+            }
+            else
+            {
+                user.institut = (string)zeile[2];
+            }
             
             return user;
         }

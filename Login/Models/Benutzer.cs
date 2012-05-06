@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using DataAnnotationsExtensions;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Login.Models
 {
@@ -45,6 +46,7 @@ namespace Login.Models
         [Email]
         [Required]
         [StringLength(50)]
+        [Remote("EmailVorhanden", "User")]
         public string email { get; set; }
 
         [Required]

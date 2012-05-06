@@ -81,6 +81,7 @@
     <Compile Include="Models\Date.cs" />
     <Compile Include="Models\Login.cs" />
     <Compile Include="Models\DBManager.cs" />
+    <Compile Include="Models\Security\HiwiBoerseRoleProvider.cs" />
     <Compile Include="Models\Stellenangebot.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
@@ -185,6 +186,12 @@
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\User\_RegisterAnbieter.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoBewerber.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoAnbieter.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />
