@@ -6,6 +6,7 @@ using System.Linq;
 using System.Web;
 using DataAnnotationsExtensions;
 using System.ComponentModel.DataAnnotations;
+using System.Web.Mvc;
 
 namespace Login.Models
 {
@@ -45,6 +46,7 @@ namespace Login.Models
         [Email]
         [Required]
         [StringLength(50)]
+        [Remote("EmailVorhanden", "User")]
         public string email { get; set; }
 
         [Required]
@@ -65,7 +67,7 @@ namespace Login.Models
         public string studiengang { get; set; }
 
         [Integer]
-        public string fachsemester { get; set; }
+        public int fachsemester { get; set; }
 
         //---------------Rechte Vergabe--------------------------------------
 

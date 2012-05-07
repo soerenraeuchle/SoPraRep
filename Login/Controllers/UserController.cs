@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Login.Models;
 using System.Web.Security;
 using System.Data.SqlClient;
+using System.Collections;
 
 namespace Login.Controllers
 {
@@ -14,11 +15,8 @@ namespace Login.Controllers
     /// </summary>
     public class UserController : Controller
     {
-        Benutzer user;
         DBManager DB = DBManager.getInstanz();
-
-
-
+        
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
         /// </summary>
@@ -46,22 +44,59 @@ namespace Login.Controllers
         /// <param name="model">Register model</param>
         /// <returns>Index.cshtml</returns>
         [HttpPost]
-        public ActionResult Register(Benutzer model)
+        public ActionResult RegisterRolle(Benutzer model)
         {
             string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-            DB.aendern("INSERT INTO " +
-                            "Benutzer " +
-                                "( vorname, nachname, email, studiengang, fachsemester, strasse, hausnummer, wohnort, plz, passwort, rechte, freischaltung, matrikelnummer, institut, stellvertreterID) " +
-                            "VALUES " +
-                                "(" +
-                                    "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
-                                    model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
-            FormsAuthentication.SetAuthCookie(user.email, false); 
+            if (!benutzerSpeichern(model))
+            {
+                return RedirectToAction("Index");
+            }
+            
+            FormsAuthentication.SetAuthCookie(model.email, false); 
             return RedirectToAction("Index");
 
         }
 
+        
+        /// <summary>
+        /// Gibt das zum Wert passende Formular zurück.
+        /// </summary>
+        /// <param name="rechte">
+        /// Wert der die Rechte des Benutzers beschreibt.
+        /// </param>
+        /// <returns>
+        /// Formular
+        /// </returns>
+        public ActionResult RegisterRolle(int rechte)
+        {
+            Benutzer model = new Benutzer();
+            model.rechte = rechte;
+            if (model.rechte == 0)
+            {
+                return PartialView("_RegisterBewerber", model);
+            }
+            else
+            {
+                return PartialView("_RegisterAnbieter", model);
+            }
+        }
 
+
+        public JsonResult EmailVorhanden(string email)
+        {
+            string query = "SELECT id FROM Benutzer WHERE email='" + email + "'";
+
+            ArrayList daten = DB.auslesen(query);
+
+            if (daten.Count>0)
+            {
+                return Json("Email schon vorhanden", JsonRequestBehavior.AllowGet);
+            }
+            return Json(true, JsonRequestBehavior.AllowGet);
+
+        }
+
+        
         /// <summary>
         /// ruft die Kontodaten des eingeloggten Benutzers ab und gibt sie auf der
         /// Kontoseite zurück
@@ -70,56 +105,47 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
-            this.user = new Benutzer();
-            user.email = HttpContext.User.Identity.Name;
-
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
-            SqlDataReader reader = DB.auslesen(query);
-            reader.Read();
-            user.vorname = reader.GetValue(0).ToString();
-            user.nachname = reader.GetValue(1).ToString();
-            user.strasse = reader.GetValue(2).ToString();
-            user.hausnummer = reader.GetValue(3).ToString();
-            user.plz = reader.GetInt32(4);
-            user.wohnort = reader.GetValue(5).ToString();
-            user.matrikelnummer = reader.GetInt32(6);
-            user.studiengang = reader.GetValue(7).ToString();
-            user.fachsemester = reader.GetValue(8).ToString();
-
-            reader.Close();
-
-            return View(user);
+            //string email = HttpContext.User.Identity.Name;
+            Benutzer benutzer = GetSessionBenutzer();
+            if (benutzer.rechte == 0)
+            {
+                return RedirectToAction("KontoBewerber");
+            }
+            else
+            {
+                return RedirectToAction("KontoAnbieter");
+            }
         }
 
+
+        [Authorize]
+        public ActionResult KontoBewerber()
+        {
+            Benutzer benutzer = GetSessionBenutzer();
+            return View(benutzer);
+        }
+
+
+        [Authorize]
+        public ActionResult KontoAnbieter()
+        {
+            Benutzer benutzer = GetSessionBenutzer();
+            return View(benutzer);
+        }
 
         /// <summary>
         /// zeigt das Kontoformular an auf der die Benutzerdaten verändert werden können
         /// </summary>
         /// <returns>KontoBearbeiten.cshtml</returns>
-        [Authorize]
+        [Authorize(Roles = "Anbieter")]
         public ActionResult KontoBearbeiten()
         {
-            this.user = new Benutzer();
-            user.email = HttpContext.User.Identity.Name;
+            //string email = HttpContext.User.Identity.Name;
+            Benutzer benutzer = GetSessionBenutzer();
 
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
-            SqlDataReader reader = DB.auslesen(query);
-            reader.Read();
-            user.vorname = reader.GetValue(0).ToString();
-            user.nachname = reader.GetValue(1).ToString();
-            user.strasse = reader.GetValue(2).ToString();
-            user.hausnummer = reader.GetValue(3).ToString();
-            user.plz = reader.GetInt32(4);
-            user.wohnort = reader.GetValue(5).ToString();
-            user.matrikelnummer = reader.GetInt32(6);
-            user.studiengang = reader.GetValue(7).ToString();
-            user.fachsemester = reader.GetValue(8).ToString();
-
-            reader.Close();
-
-            return View(user);
+            return View(benutzer);
         }
-
+        
         /// <summary>
         /// Übernimmt die vom Benutzer in die KontoBearbeiten Seite eingetragenen Änderungen
         /// in die Datenbank und leitet den Benutzer auf die Konto Seite weiter
@@ -127,7 +153,7 @@ namespace Login.Controllers
         /// <param name="user">Benutzer model</param>
         /// <returns>Konto.cshtml</returns>
         [HttpPost]
-        [Authorize]
+        [Authorize(Roles="Anbieter")]
         public ActionResult KontoBearbeiten(Benutzer user)
         {
             user.email = HttpContext.User.Identity.Name;
@@ -158,34 +184,47 @@ namespace Login.Controllers
         [HttpPost]
         public ActionResult Login(Login.Models.Login user)
         {
-            string password = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
-
-            
+            user.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
-                string query = "SELECT passwort FROM Benutzer WHERE email='" + user.Email + "'";
-                SqlDataReader reader = DB.auslesen(query);
-                reader.Read();
-                string pw = reader.GetValue(0).ToString();
-
-                if (password == pw)
+                string query = "SELECT passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
+                ArrayList daten = DB.auslesen(query);
+                if (daten == null)
                 {
-                    FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                    return View("index"); //Fehlerbehandlung
+                }
+                
+                if (daten.Count != 0)
+                {
+                    ArrayList zeile = (ArrayList)daten[0];
 
-                    reader.Close();
-                    return RedirectToAction("index", "User");
+                    string pw = (string)zeile[0];
+                    int rechte = (int)zeile[1];
+
+                    if (user.Passwort == pw)
+                    {
+                        FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        Benutzer benutzer = new Benutzer();
+                        benutzer.email = user.Email;
+                        benutzer.passwort = user.Passwort;
+                        benutzer.rechte = rechte;
+                        HttpContext.Session["benutzer"] = benutzer;
+
+                        return RedirectToAction("index", "User");
+                    }
+                    
+                    ModelState.AddModelError("", "Passwort falsch");
+                    
+
                 }
                 else
-                { // falsches passwort
-
+                {
+                    ModelState.AddModelError("", "Emailadresse existiert nicht");
                 }
-                reader.Close();
+
             }
-            else
-            {
-                ModelState.AddModelError("", "Falsche eingabe");
-            }
+           
             return View("index");
         }
 
@@ -209,52 +248,133 @@ namespace Login.Controllers
         /// <returns>Boolean erfolgreich</returns>
         private bool benutzerSpeichern(Benutzer user)
         {
-            string query = "INSERT INTO " +
+            string query;
+            user.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.passwort, "SHA1");
+
+            if (user.rechte == 0)
+            {
+                user.freischaltung = true;
+                query =     "INSERT INTO " +
                                 "Benutzer " +
                                     "(" +
                                         "vorname, " +
                                         "nachname, " +
+
                                         "email, " +
-                                        "studiengang, " +
-                                        "fachsemester, " +
-                                        "strasse, " +
-                                        "hausnummer, " +
-                                        "wohnort, " +
-                                        "plz, " +
                                         "passwort, " +
+
                                         "rechte, " +
                                         "freischaltung, " +
-                                        "matrikelnummer, " +
-                                        "institut, " +
-                                        "stellvertreterID" +
+
+                                        "studiengang, " +
+                                        "fachsemester, " +
+
+                                        "strasse, " +
+                                        "hausnummer, " +
+                                        "plz, " +
+                                        "wohnort, " +
+
+                                        "matrikelnummer " +
                                     ") " +
                                 "VALUES " +
                                     "(" +
                                         "'" + user.vorname + "', " +
                                         "'" + user.nachname + "', " +
                                         "'" + user.email + "', " +
+                                        "'" + user.passwort + "', " +
+
+                                        user.rechte + ", " +
+                                        "'" + user.freischaltung + "', " +
+
                                         "'" + user.studiengang + "', " +
                                         user.fachsemester + ", " +
                                         "'" + user.strasse + "', " +
                                         "'" + user.hausnummer + "', " +
-                                        "'" + user.wohnort + "', " +
                                         user.plz + ", " +
-                                        "'" + user.passwort + "', " +
-                                        user.rechte + ", " +
-                                        user.freischaltung + ", " +
-                                        user.matrikelnummer + ", " +
-                                        "'" + user.institut + "', " +
-                                        user.stellvertreterID +
+                                        "'" + user.wohnort + "', " +
+
+                                        user.matrikelnummer + " " +
                                     ")";
+            }
+            else
+            {
+                user.freischaltung = false;
+
+                query =     "INSERT INTO " +
+                                "Benutzer " +
+                                    "(" +
+                                        "vorname, " +
+                                        "nachname, " +
+
+                                        "email, " +
+                                        "passwort, " +
+
+                                        "rechte, " +
+                                        "freischaltung, " +
+
+                                        "institut " +
+                                        //"stellvertreterID" + Achtung Komma nach institut gelöscht
+                                    ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "'" + user.vorname + "', " +
+                                        "'" + user.nachname + "', " +
+                                        "'" + user.email + "', " +
+                                        "'" + user.passwort + "', " +
+
+                                        user.rechte + ", " +
+                                        "'" + user.freischaltung + "', " +
+
+                                        "'" + user.institut + "' " +
+                                        //user.stellvertreterID + Achtung Komma nach institut gelöscht
+                                    ")";
+            }
+
             
-            DB.aendern(query);
+            int affectedRows = DB.aendern(query);
+            if (affectedRows == -1)
+            {
+                return false;
+            }
             return true;
         }
 
         //TODO
-        private bool GetUserByEmail(string email)
+        [Authorize]
+        private Benutzer GetSessionBenutzer()
         {
-            return true;
+            Benutzer user = new Benutzer();
+            user = (Benutzer)HttpContext.Session["benutzer"];
+
+            string query;
+            if (user.rechte == 0)
+            {
+                query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
+            }
+            else
+            {
+                query = "SELECT vorname, nachname, institut FROM Benutzer WHERE email='" + user.email + "'";
+            }
+            ArrayList daten = DB.auslesen(query);
+            ArrayList zeile = (ArrayList)daten[0];
+            user.vorname = (string)zeile[0];
+            user.nachname = (string)zeile[1];
+            if (user.rechte == 0)
+            {
+                user.strasse = (string)zeile[2];
+                user.hausnummer = (string)zeile[3];
+                user.plz = (int)zeile[4];
+                user.wohnort = (string)zeile[5];
+                user.matrikelnummer = (int)zeile[6];
+                user.studiengang = (string)zeile[7];
+                user.fachsemester = (int)zeile[8];
+            }
+            else
+            {
+                user.institut = (string)zeile[2];
+            }
+            
+            return user;
         }
     }
 }

@@ -1,0 +1,7 @@
+bin/
+obj/
+App_Data/
+/*.suo
+Login/bin/
+Login/obj/
+Login/App_Data/

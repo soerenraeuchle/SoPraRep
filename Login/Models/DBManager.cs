@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using System.Data.SqlClient;
+using System.Collections;
 
 
 
@@ -22,6 +23,9 @@ namespace Login.Models
         private static string ConnectionString = "Data Source=.\\SQLEXPRESS;AttachDbFilename=|DataDirectory|Sopra.mdf;Integrated Security=True;User Instance=True";
         private SqlConnection con = new SqlConnection(ConnectionString);
 
+        private string lastSqlQuery;
+        private string lastError;
+
         /// <summary>
         /// Gibt die Instanz der DBManager-Klasse zurück.
         /// </summary>
@@ -33,10 +37,6 @@ namespace Login.Models
             if (instance == null)
             {
                 instance = new DBManager();
-                if (!instance.connect())
-                {
-                    return null; 
-                }
             }
             
             return instance;
@@ -53,14 +53,33 @@ namespace Login.Models
             }
             catch (SqlException e)
             {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
             catch (InvalidOperationException e)
             {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
                 return false;
             }
         }
-        
+
+
+        private bool disconnect()
+        {
+            try
+            {
+                con.Close();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
 
         /// <summary>
         /// Führt einen SQL Befehl aus, der Zeilen zurückgibt.
@@ -71,22 +90,53 @@ namespace Login.Models
         /// <returns>
         /// Gibt ein SqlDataReader Objekt zurück, das die Daten des Querys enthält. Im Fehlerfall wird null zurückgegeben.
         /// </returns>
-        public SqlDataReader auslesen(string query)
+        public ArrayList auslesen(string query)
         {
-            SqlCommand cmd = new SqlCommand(query, con);
+            
             try
             {
-                SqlDataReader tmp = cmd.ExecuteReader();
-                return tmp;
+                lastSqlQuery = query;
+                ArrayList daten = new ArrayList();
+                if (!connect()) return null;
+                SqlCommand cmd = new SqlCommand(query, con);
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while(reader.Read()) 
+                    {
+                        int columns = reader.FieldCount;
+
+                        ArrayList data = new ArrayList();
+
+                        for (int i = 0; i < columns; i++)
+                        {
+                            var tmp = reader.GetValue(i);
+                            data.Add(tmp);
+                        }
+
+                        daten.Add(data);
+
+                    }
+                }
+                reader.Close();
+
+                if (!disconnect()) return null;
+                return daten;
             }
             catch (SqlException e)
             {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
             catch (InvalidOperationException e)
             {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
                 return null;
             }
+
+            
         }
 
 
@@ -101,8 +151,21 @@ namespace Login.Models
         /// </returns>
         public int aendern(string query)
         {
-            SqlCommand cmd = new SqlCommand(query, con);
-            return cmd.ExecuteNonQuery();
+            try
+            {
+                lastSqlQuery = query;
+                if (!connect()) return -1;
+                SqlCommand cmd = new SqlCommand(query, con);
+                int affectedRows = cmd.ExecuteNonQuery();
+                if (!disconnect()) return -1;
+                return affectedRows;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return -1;
+            }
         }
     }
 }
