@@ -19,8 +19,8 @@ namespace Login.Controllers
         public ActionResult NeuesStellenAngebot()
         {
             Stellenangebot stelle = new Stellenangebot();
-            ViewData.Add("Title", "Stellenangebot erstellen");
-            ViewData.Add("Methode", "NeueStelleSpeichern");
+            ViewBag.Title = "Stellenangebot erstellen";
+            ViewBag.Methode = "NeueStelleSpeichern";
             return View("StellenangebotBearbeiten",stelle);
         }
 
@@ -38,7 +38,7 @@ namespace Login.Controllers
             {
                 int[] userData = getUserDaten();
                 stelle.anbieterID = userData[0];
-                if(StelleHinzufügen(stelle))
+                if(DB.stellenangebotHinzufügen(stelle))
                 {
                     return RedirectToAction("Index","User");
                 }
@@ -48,71 +48,14 @@ namespace Login.Controllers
         }
 
 
-        /// <summary>
-        /// Die Methode StelleHinzufügen erzeugt das DB Statement um eine neue Stelle in die Datenbank zu speichern und schickt die query an den DBManager
-        /// </summary>
-        /// <param name="stelle"></param>
-        /// <returns></returns>
-        [Authorize]
-        private bool StelleHinzufügen(Stellenangebot stelle)
-        {
-            string startAnstellung = stelle.startAnstellung.getDate();
-            string endeAnstellung = stelle.endeAnstellung.getDate();
-            string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
-            string query = "INSERT INTO " +
-                                "Stellenangebote " +
-                                    "(" +
-                                        "stellenName, " +
-                                        "beschreibung, " +
-                                        "institut, " +
-                                        "anbieterID, " +
-                                        "startAnstellung, " +
-                                        "endeAnstellung, " +
-                                        "bewerbungsFrist, " +
-                                        "monatsStunden, " +
-                                        "anzahlOffeneStellen, " +
-                                        "ort, " +
-                                        "vorraussetzungen " + ") " +
-                                "VALUES " +
-                                    "(" +
-                                        "'" + stelle.stellenName + "', " +
-                                        "'" + stelle.beschreibung + "', " +
-                                        "'" + stelle.institut + "', " +
-                                        "" + stelle.anbieterID + ",' " +
-                                        startAnstellung + "', " +
-                                        "'" + endeAnstellung + "', " +
-                                        "'" + bewerbungsFrist + "', " +
-                                        "'" + stelle.monatsStunden + "', " +
-                                        stelle.anzahlOffeneStellen + ", " +
-                                        "'" + stelle.ort + "', '" +
-                                        stelle.vorraussetzungen + "')";
 
-            try
-            {
-                DB.aendern(query);
-                return true;
-            }
-            catch (SqlException e)
-            {
-                return false;
-            }
-        }
+
 
         public PartialViewResult _StellenAngebotSteuerung()
         {
             int[] userData = getUserDaten();
-            SqlDataReader reader = DB.auslesen("Select id, stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen " +
-                                                "from Stellenangebote where anbieterID = " + userData[0] + "");//HIER GEHTS WEITER
-            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
-            string DateFormat = "dd-MM-yyyy";
 
-            while (reader.Read())
-            {
-                liste.AddLast(new Stellenangebot(Convert.ToInt32(reader.GetValue(0)), reader.GetValue(1).ToString(), reader.GetValue(2).ToString(), reader.GetValue(3).ToString(), Convert.ToInt32(reader.GetValue(4)), new Date(reader.GetDateTime(5).ToString(DateFormat)), 
-                                             new Date(reader.GetDateTime(6).ToString(DateFormat)), new Date(reader.GetDateTime(7).ToString(DateFormat)), Convert.ToInt32(reader.GetValue(8)), Convert.ToInt32(reader.GetValue(9)), reader.GetValue(10).ToString(), reader.GetValue(11).ToString())); 
-            }
-            StellenangebotUebersicht angebote = new StellenangebotUebersicht(liste);
-            reader.Close();
+            StellenangebotUebersicht angebote = new StellenangebotUebersicht(DB.stellenangebotUebersichtLesen(userData[0]));
             return PartialView(angebote);
         }
 
@@ -122,45 +65,18 @@ namespace Login.Controllers
         /// <returns></returns>
         [Authorize]
         [HttpPost]
-        public ActionResult GetStelleAngebot(int id, string view)
+        public ActionResult GetStelleAngebot(Stellenangebot stelle, string view)
         {
-            Stellenangebot stelle = new Stellenangebot();
+            Stellenangebot aktStelle = DB.stellenangebotLesen(stelle.id);
 
-            string query = "SELECT stellenName, beschreibung, institut, anbieterID, startAnstellung, endeAnstellung, bewerbungsFrist, monatsStunden, anzahlOffeneStellen, ort, vorraussetzungen FROM Stellenangebote WHERE id=" + id + "";
-            SqlDataReader reader = DB.auslesen(query);
-            if (reader.HasRows)
-            {
-                int[] userdata = getUserDaten();
-                string dateformat = "dd-MM-yyyy";
-                reader.Read();
-                stelle.stellenName = reader.GetValue(0).ToString();
-                stelle.beschreibung = reader.GetValue(1).ToString();
-                stelle.institut = reader.GetValue(2).ToString();
-                stelle.anbieterID = Convert.ToInt32(reader.GetValue(3));
-                stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
-                stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
-                stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
-                stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
-                stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
-                stelle.ort = reader.GetValue(9).ToString();
-                stelle.vorraussetzungen = reader.GetValue(10).ToString();
-                stelle.id = id;
-                reader.Close();
-                
-                ViewData.Add("Title", "Stellenangebot bearbeiten");
-                ViewData.Add("Methode", "StelleAktualisieren");
-                if (view == "anzeigen")
-                {
-                    return View("StellenAngebot", stelle);
-                }
-                else
-                {
-                    return View("StellenangebotBearbeiten", stelle);
-                }
-            }
-            reader.Close();
+            ViewBag.Title = "Stellenangebot erstellen";
+            ViewBag.Methode = "NeueStelleSpeichern";
+            
 
-            return View();
+            if (view == "anzeigen")
+                return View("StellenAngebot", aktStelle);
+            return View("StellenangebotBearbeiten", aktStelle);
+            
         }
 
 
@@ -176,27 +92,10 @@ namespace Login.Controllers
             if (ModelState.IsValid)
             {
                 int[] userData = getUserDaten();
-                string startAnstellung = stelle.startAnstellung.getDate();
-                string endeAnstellung = stelle.endeAnstellung.getDate();
-                string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
+                stelle.anbieterID = userData[0];
+                DB.stellenangebotAktualisieren(stelle);
 
-                string query = "UPDATE Stellenangebote SET " +
-                                    "stellenName='" + stelle.stellenName + "', " +
-                                    "beschreibung='" + stelle.beschreibung + "', " +
-                                    "institut='" + stelle.institut + "', " +
-                                    "anbieterID=" + userData[0] + ", " +
-                                    "startAnstellung='" + startAnstellung + "', " +
-                                    "endeAnstellung='" + endeAnstellung + "', " +
-                                    "bewerbungsFrist='" + bewerbungsFrist + "', " +
-                                    "monatsStunden=" + stelle.monatsStunden + ", " +
-                                    "anzahlOffeneStellen=" + stelle.anzahlOffeneStellen + ", " +
-                                    "ort='" + stelle.ort + "', " +
-                                    "vorraussetzungen='" + stelle.vorraussetzungen + "' " +
-                                "WHERE id=" + stelle.id + "";
-
-                DB.aendern(query);
-
-                return View("Stellenangebot", stelle);
+                return View("StellenAngebot", stelle);
             }
             return View("StellenangebotBearbeiten",stelle);
         }
@@ -205,21 +104,16 @@ namespace Login.Controllers
         /// <summary>
         /// Löscht eine bestehende StellenAnzeige aus der Datenbank
         /// </summary>
-        /// <param name="stelle"></param>
+        /// <param name="id"></param>
         /// <returns></returns>
         [HttpPost]
         [Authorize]
         public ActionResult StelleLöschen(Stellenangebot stelle)
         {
-            int id = stelle.id;
-            string query = "DELETE FROM Stellenangebote" +
-                            "WHERE id ="+id;
-
-            DB.aendern(query);
-
-            return View();
+            DB.stellenangebotLoeschen(stelle);
+            return RedirectToAction("Index", "User");
         }
-
+    
         public int[] getUserDaten()
         {
             FormsIdentity ident = User.Identity as FormsIdentity;

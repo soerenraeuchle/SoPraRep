@@ -185,9 +185,6 @@
     <Content Include="Views\User\KontoEdit.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\Shared\_StellenAngebotSteuerung.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\AngeboteManager\StellenAngebot.cshtml" />
   </ItemGroup>
   <ItemGroup>

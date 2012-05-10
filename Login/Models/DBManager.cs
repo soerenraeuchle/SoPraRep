@@ -4,6 +4,7 @@ using System.Linq;
 using System.Web;
 using System.Data.Entity;
 using System.Data.SqlClient;
+using System.Collections;
 
 
 
@@ -62,6 +63,12 @@ namespace Login.Models
                 return false;
             }
         }
+
+        private bool disconntect()
+        {
+            con.Close();
+            return true;
+        }
         
 
         /// <summary>
@@ -106,6 +113,7 @@ namespace Login.Models
         public int aendern(string query)
         {
             SqlCommand cmd = new SqlCommand(query, con);
+            
             try
             {
                 int affectedRows = cmd.ExecuteNonQuery();
@@ -115,6 +123,246 @@ namespace Login.Models
             {
                 Console.WriteLine(e.StackTrace);
                 return -1;
+            }
+        }
+        //--------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------STELLENANGEBOTE PREPARED STATEMENTS--------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
+        public bool stellenangebotAktualisieren(Models.Stellenangebot stelle)
+        {
+            string startAnstellung = stelle.startAnstellung.getDate();
+            string endeAnstellung = stelle.endeAnstellung.getDate();
+            string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
+
+            string query = "UPDATE Stellenangebote SET " +
+                                    "stellenName= @stellenName, " +
+                                    "beschreibung = @beschreibung, " +
+                                    "institut = @institut, " +
+                                    "anbieterID = @anbieterID, " +
+                                    "startAnstellung = @startanstellung, " +
+                                    "endeAnstellung = @endeAnstellung, " +
+                                    "bewerbungsfrist = @bewerbungsfrist, " +
+                                    "monatsStunden = @monatsStunden, " +
+                                    "anzahlOffeneStellen = @anzahlOffeneStellen, " +
+                                    "ort = @ort, " +
+                                    "vorraussetzungen = @vorraussetzungen " +
+                                    "WHERE id = @id";
+           
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@stellenName", stelle.stellenName);
+                cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
+                cmd.Parameters.AddWithValue("@institut", stelle.institut);
+                cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
+                cmd.Parameters.AddWithValue("@startanstellung", startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
+                cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
+                cmd.Parameters.AddWithValue("@ort", stelle.ort);
+                cmd.Parameters.AddWithValue("@vorraussetzungen", stelle.vorraussetzungen);
+                cmd.Parameters.AddWithValue("@id", stelle.id);
+
+           
+                connect();
+                cmd.ExecuteNonQuery();
+                disconntect();
+                return true;
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+        public bool stellenangebotHinzufügen(Stellenangebot stelle)
+        {
+            string startAnstellung = stelle.startAnstellung.getDate();
+            string endeAnstellung = stelle.endeAnstellung.getDate();
+            string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
+
+            string query = "INSERT INTO Stellenangebote" +
+                                    "(" +
+                                        "stellenName, " +
+                                        "beschreibung, " +
+                                        "institut, " +
+                                        "anbieterID, " +
+                                        "startAnstellung, " +
+                                        "endeAnstellung, " +
+                                        "bewerbungsFrist, " +
+                                        "monatsStunden, " +
+                                        "anzahlOffeneStellen, " +
+                                        "ort, " +
+                                        "vorraussetzungen " + ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "@stellenName, " +
+                                        "@beschreibung, " +
+                                        "@institut, " +
+                                        "@anbieterID, " +
+                                        "@startAnstellung, " +
+                                        "@endeAnstellung, " +
+                                        "@bewerbungsFrist, " +
+                                        "@monatsStunden, " +
+                                        "@anzahlOffeneStellen, " +
+                                        "@ort, " +
+                                        "@vorraussetzungen " + ") ";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@stellenName", stelle.stellenName);
+                cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
+                cmd.Parameters.AddWithValue("@institut", stelle.institut);
+                cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
+                cmd.Parameters.AddWithValue("@startanstellung", startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
+                cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
+                cmd.Parameters.AddWithValue("@ort", stelle.ort);
+                cmd.Parameters.AddWithValue("@vorraussetzungen", stelle.vorraussetzungen);
+
+
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconntect();
+                return true;
+
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+        public bool stellenangebotLoeschen(Stellenangebot stelle){
+            string query = "DELETE FROM Stellenangebote " +
+                            "WHERE id = @id";
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", stelle.id);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconntect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+        public Stellenangebot stellenangebotLesen(int stellenID)
+        {
+            Stellenangebot stelle = new Stellenangebot();
+            string dateformat = "dd-MM-yyyy";
+
+            string query = "SELECT stellenName, " +
+                "beschreibung, institut, anbieterID, " +
+                "startAnstellung, endeAnstellung, " +
+                "bewerbungsFrist, monatsStunden, " +
+            "anzahlOffeneStellen, ort, vorraussetzungen " +
+            "FROM Stellenangebote WHERE id= @id";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", stellenID);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    stelle.stellenName = reader.GetValue(0).ToString();
+                    stelle.beschreibung = reader.GetValue(1).ToString();
+                    stelle.institut = reader.GetValue(2).ToString();
+                    stelle.anbieterID = Convert.ToInt32(reader.GetValue(3));
+                    stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
+                    stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
+                    stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
+                    stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
+                    stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
+                    stelle.ort = reader.GetValue(9).ToString();
+                    stelle.vorraussetzungen = reader.GetValue(10).ToString();
+                    stelle.id = stellenID;
+
+
+                }
+
+                reader.Close();
+                disconntect();
+                return stelle;
+            }
+            catch (SqlException e)
+            {
+                return null;
+            }
+        }
+
+        public LinkedList<Stellenangebot> stellenangebotUebersichtLesen(int anbieterID)
+        {
+            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
+            string dateformat = "dd-MM-yyyy";
+
+            string query = "SELECT stellenName, " +
+                "beschreibung, institut, anbieterID, " +
+                "startAnstellung, endeAnstellung, " +
+                "bewerbungsFrist, monatsStunden, " +
+            "anzahlOffeneStellen, ort, vorraussetzungen, id " +
+            "FROM Stellenangebote WHERE anbieterID= @anbieterID";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@anbieterID", anbieterID);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        Stellenangebot stelle = new Stellenangebot();
+                        stelle.stellenName = reader.GetValue(0).ToString();
+                        stelle.beschreibung = reader.GetValue(1).ToString();
+                        stelle.institut = reader.GetValue(2).ToString();
+                        stelle.anbieterID = anbieterID;
+                        stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
+                        stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
+                        stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
+                        stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
+                        stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
+                        stelle.ort = reader.GetValue(9).ToString();
+                        stelle.vorraussetzungen = reader.GetValue(10).ToString();
+                        stelle.id = Convert.ToInt32(reader.GetValue(11));
+
+                        liste.AddLast(stelle);
+                    }
+
+                }
+
+                reader.Close();
+                disconntect();
+                return liste;
+            }
+            catch (SqlException e)
+            {
+                return null;
             }
         }
     }
