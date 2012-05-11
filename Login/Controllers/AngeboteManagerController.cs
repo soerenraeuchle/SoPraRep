@@ -50,7 +50,10 @@ namespace Login.Controllers
 
 
 
-
+        /// <summary>
+        /// Läd alle eigenen Stellenangebote in eine Liste und fügt sie der Partiellen View _StellenangeboteÜbersicht hinzu
+        /// </summary>
+        /// <returns></returns>
         public PartialViewResult _StellenAngebotSteuerung()
         {
             int[] userData = getUserDaten();
@@ -60,7 +63,7 @@ namespace Login.Controllers
         }
 
         /// <summary>
-        /// Läd ein ausgewähltes Stellenangebot mithilfe einer id
+        /// Läd ein ausgewähltes Stellenangebot mithilfe einer id, die View Variable gibt an ob ein Stellenangebot angezeigt wird oder bearbeitet wird
         /// </summary>
         /// <returns></returns>
         [Authorize]
@@ -114,6 +117,10 @@ namespace Login.Controllers
             return RedirectToAction("Index", "User");
         }
     
+        /// <summary>
+        /// Liest aus dem FormsAuthenticationTicket die User ID und die User Rolle
+        /// </summary>
+        /// <returns></returns>
         public int[] getUserDaten()
         {
             FormsIdentity ident = User.Identity as FormsIdentity;
