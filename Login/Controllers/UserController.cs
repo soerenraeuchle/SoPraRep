@@ -46,15 +46,20 @@ namespace Login.Controllers
         [HttpPost]
         public ActionResult RegisterRolle(Benutzer model)
         {
-            string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-            if (!benutzerSpeichern(model))
+            if (ModelState.IsValid)
             {
-                return RedirectToAction("Index");
+                if (model.rechte != 3) //Registrierung als Admin nicht zulassen.
+                {
+                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
+                    if (DB.benutzerSpeichern(model))
+                    {
+                        FormsAuthentication.SetAuthCookie(model.email, false);
+                        //return RedirectToAction("Index");
+                    }
+                }
             }
-            
-            FormsAuthentication.SetAuthCookie(model.email, false); 
+           
             return RedirectToAction("Index");
-
         }
 
         
@@ -246,98 +251,104 @@ namespace Login.Controllers
         /// </summary>
         /// <param name="user">Register model</param>
         /// <returns>Boolean erfolgreich</returns>
-        private bool benutzerSpeichern(Benutzer user)
-        {
-            string query;
-            user.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.passwort, "SHA1");
+        //private bool benutzerSpeichern(Benutzer user)
+        //{
+        //    string query;
+        //    user.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.passwort, "SHA1");
+        //    Object[] values;
 
-            if (user.rechte == 0)
-            {
-                user.freischaltung = true;
-                query =     "INSERT INTO " +
-                                "Benutzer " +
-                                    "(" +
-                                        "vorname, " +
-                                        "nachname, " +
+        //    if (user.rechte == 0)
+        //    {
+        //        user.freischaltung = true;
+        //        query =     "INSERT INTO " +
+        //                        "Benutzer " +
+        //                            "(" +
+        //                                "vorname, " +
+        //                                "nachname, " +
 
-                                        "email, " +
-                                        "passwort, " +
+        //                                "email, " +
+        //                                "passwort, " +
 
-                                        "rechte, " +
-                                        "freischaltung, " +
+        //                                "rechte, " +
+        //                                "freischaltung, " +
 
-                                        "studiengang, " +
-                                        "fachsemester, " +
+        //                                "studiengang, " +
+        //                                "fachsemester, " +
 
-                                        "strasse, " +
-                                        "hausnummer, " +
-                                        "plz, " +
-                                        "wohnort, " +
+        //                                "strasse, " +
+        //                                "hausnummer, " +
+        //                                "plz, " +
+        //                                "wohnort, " +
 
-                                        "matrikelnummer " +
-                                    ") " +
-                                "VALUES " +
-                                    "(" +
-                                        "'" + user.vorname + "', " +
-                                        "'" + user.nachname + "', " +
-                                        "'" + user.email + "', " +
-                                        "'" + user.passwort + "', " +
+        //                                "matrikelnummer " +
+        //                            ") " +
+        //                        "VALUES " +
+        //                            "(" +
+        //                                "'" + user.vorname + "', " +
+        //                                "'" + user.nachname + "', " +
+        //                                "'" + user.email + "', " +
+        //                                "'" + user.passwort + "', " +
 
-                                        user.rechte + ", " +
-                                        "'" + user.freischaltung + "', " +
+        //                                user.rechte + ", " +
+        //                                "'" + user.freischaltung + "', " +
 
-                                        "'" + user.studiengang + "', " +
-                                        user.fachsemester + ", " +
-                                        "'" + user.strasse + "', " +
-                                        "'" + user.hausnummer + "', " +
-                                        user.plz + ", " +
-                                        "'" + user.wohnort + "', " +
+        //                                "'" + user.studiengang + "', " +
+        //                                user.fachsemester + ", " +
+        //                                "'" + user.strasse + "', " +
+        //                                "'" + user.hausnummer + "', " +
+        //                                user.plz + ", " +
+        //                                "'" + user.wohnort + "', " +
 
-                                        user.matrikelnummer + " " +
-                                    ")";
-            }
-            else
-            {
-                user.freischaltung = false;
+        //                                user.matrikelnummer + " " +
 
-                query =     "INSERT INTO " +
-                                "Benutzer " +
-                                    "(" +
-                                        "vorname, " +
-                                        "nachname, " +
+        //                            ")";
+        //        values = new Object[1];
+        //    }
+        //    else
+        //    {
+        //        user.freischaltung = false;
 
-                                        "email, " +
-                                        "passwort, " +
+        //        query =     "INSERT INTO " +
+        //                        "Benutzer " +
+        //                            "(" +
+        //                                "vorname, " +
+        //                                "nachname, " +
 
-                                        "rechte, " +
-                                        "freischaltung, " +
+        //                                "email, " +
+        //                                "passwort, " +
 
-                                        "institut " +
-                                        //"stellvertreterID" + Achtung Komma nach institut gelöscht
-                                    ") " +
-                                "VALUES " +
-                                    "(" +
-                                        "'" + user.vorname + "', " +
-                                        "'" + user.nachname + "', " +
-                                        "'" + user.email + "', " +
-                                        "'" + user.passwort + "', " +
+        //                                "rechte, " +
+        //                                "freischaltung, " +
 
-                                        user.rechte + ", " +
-                                        "'" + user.freischaltung + "', " +
+        //                                "institut " +
+        //                                //"stellvertreterID" + Achtung Komma nach institut gelöscht
+        //                            ") " +
+        //                        "VALUES " +
+        //                            "(" +
+        //                                "'" + user.vorname + "', " +
+        //                                "'" + user.nachname + "', " +
+        //                                "'" + user.email + "', " +
+        //                                "'" + user.passwort + "', " +
 
-                                        "'" + user.institut + "' " +
-                                        //user.stellvertreterID + Achtung Komma nach institut gelöscht
-                                    ")";
-            }
+        //                                user.rechte + ", " +
+        //                                "'" + user.freischaltung + "', " +
+
+        //                                "'" + user.institut + "' " +
+
+        //                                //user.stellvertreterID + Achtung Komma nach institut gelöscht
+
+        //                            ")";
+                    
+        //    }
 
             
-            int affectedRows = DB.aendern(query);
-            if (affectedRows == -1)
-            {
-                return false;
-            }
-            return true;
-        }
+        //    //int affectedRows = DB.aendernPrepared(query, values);
+        //    if (affectedRows == -1)
+        //    {
+        //        return false;
+        //    }
+        //    return true;
+        //}
 
         //TODO
         [Authorize]

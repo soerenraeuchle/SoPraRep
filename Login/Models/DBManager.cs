@@ -5,6 +5,8 @@ using System.Web;
 using System.Data.Entity;
 using System.Data.SqlClient;
 using System.Collections;
+using System.Web.Security;
+using System.Web.Mvc;
 
 
 
@@ -140,6 +142,95 @@ namespace Login.Models
         }
 
 
+        public bool benutzerSpeichern(Benutzer benutzer)
+        {
+            benutzer.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(benutzer.passwort, "SHA1");
+
+            string query = "INSERT INTO " +
+                                "Benutzer " +
+                                    "(" +
+                                        "vorname, " +
+                                        "nachname, " +
+
+                                        "email, " +
+                                        "passwort, " +
+
+                                        "rechte, " +
+                                        "freischaltung, " +
+
+                                        "studiengang, " +
+                                        "fachsemester, " +
+
+                                        "strasse, " +
+                                        "hausnummer, " +
+                                        "plz, " +
+                                        "wohnort, " +
+
+                                        "matrikelnummer " +
+
+                                        "institut, " +
+                                        "stellvertreterID" +
+                                    ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "@vorname, " +
+                                        "@nachname, " +
+
+                                        "@email, " +
+                                        "@passwort, " +
+
+                                        "@rechte, " +
+                                        "@freischaltung, " +
+
+                                        "@studiengang, " +
+                                        "@fachsemester, " +
+
+                                        "@strasse, " +
+                                        "@hausnummer, " +
+                                        "@plz, " +
+                                        "@wohnort, " +
+
+                                        "@matrikelnummer, " +
+
+                                        "@institut, " +
+                                        "@stellvertreterID" +
+
+                                    ")";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@vorname", benutzer.vorname);
+                cmd.Parameters.AddWithValue("@nachname", benutzer.nachname);
+                cmd.Parameters.AddWithValue("@email", benutzer.email);
+                cmd.Parameters.AddWithValue("@passwort", benutzer.passwort);
+                cmd.Parameters.AddWithValue("@rechte", benutzer.rechte);
+                cmd.Parameters.AddWithValue("@freischaltung", benutzer.freischaltung);
+                cmd.Parameters.AddWithValue("@studiengang", benutzer.studiengang);
+                cmd.Parameters.AddWithValue("@fachsemester", benutzer.fachsemester);
+                cmd.Parameters.AddWithValue("@strasse", benutzer.strasse);
+                cmd.Parameters.AddWithValue("@hausnummer", benutzer.hausnummer);
+                cmd.Parameters.AddWithValue("@plz", benutzer.plz);
+                cmd.Parameters.AddWithValue("@wohnort", benutzer.wohnort);
+                cmd.Parameters.AddWithValue("@matrikelnummer", benutzer.matrikelnummer);
+                cmd.Parameters.AddWithValue("@institut", benutzer.institut);
+                cmd.Parameters.AddWithValue("@stellvertreterID", benutzer.stellvertreterID);
+
+                
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
         /// <summary>
         /// Führt einen SQL Befehl aus, der schreibend auf die Datenbank zugreift.
         /// </summary>
@@ -167,5 +258,46 @@ namespace Login.Models
                 return -1;
             }
         }
+
+
+        //public int aendernPrepared(string query, Object[] values)
+        //{
+        //    try
+        //    {
+        //        lastSqlQuery = query;
+        //        if (!connect()) return -1;
+        //        SqlCommand cmd = new SqlCommand(query, con);
+        //        cmd.Prepare();
+        //        for (int i = 0; i < values.Count(); i++)
+        //        {
+        //            Type typ = values[i].GetType();
+
+        //            //If TypeOf a Is CBackware Then
+
+        //            if (typ.IsInstanceOfType(string)) {
+
+        //            }
+
+        //            if (typ.IsInstanceOfType(int)) {
+
+        //            }
+        //            if (typ.IsInstanceOfType(bool)) {
+
+        //            }
+
+        //            cmd.Parameters.Add(values[i]);
+        //        }
+
+        //        int affectedRows = cmd.ExecuteNonQuery();
+        //        if (!disconnect()) return -1;
+        //        return affectedRows;
+        //    }
+        //    catch (SqlException e)
+        //    {
+        //        lastError = e.StackTrace;
+        //        Console.WriteLine(e.StackTrace);
+        //        return -1;
+        //    }
+        //}
     }
 }
