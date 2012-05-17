@@ -184,11 +184,13 @@ namespace Login.Models
                 if (reader.HasRows)
                 {
                     disconnect();
+                    reader.Close();
                     return true;
                 }
                 else
                 {
                     disconnect();
+                    reader.Close();
                     return false;
                 }
             }
@@ -196,6 +198,7 @@ namespace Login.Models
             {
                 lastError = e.StackTrace;
                 Console.WriteLine(e.StackTrace);
+                
                 return false;
             }
         }
@@ -457,21 +460,22 @@ namespace Login.Models
 
                 connect();
                 SqlDataReader reader = cmd.ExecuteReader();
-                reader.Read();
+                    reader.Read();
 
-                //Anbieter auslesen
-                benutzer.vorname = reader.GetString(0);
-                benutzer.nachname = reader.GetString(1);
-                benutzer.institut = reader.GetString(2);
+                    //Anbieter auslesen
+                    benutzer.vorname = reader.GetString(0);
+                    benutzer.nachname = reader.GetString(1);
+                    benutzer.institut = reader.GetString(2);
 
-                benutzer.passwort = reader.GetString(3);
-                benutzer.confirmPasswort = benutzer.passwort;
+                    benutzer.passwort = reader.GetString(3);
+                    benutzer.confirmPasswort = benutzer.passwort;
 
-                benutzer.id = reader.GetInt32(4);
+                    benutzer.id = reader.GetInt32(4);
 
-                benutzer.email = email;
+                    benutzer.email = email;
 
-                reader.Close();
+                    reader.Close();
+                
                 disconnect();
                 return benutzer;
             }

@@ -24,8 +24,10 @@
       else
       {
         @Html.Partial("_BenutzerSteuerung")
-        @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
-
+        if(Roles.IsUserInRole("Anbieter"))
+        {
+            @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
+        }
       }
     }
     </div>

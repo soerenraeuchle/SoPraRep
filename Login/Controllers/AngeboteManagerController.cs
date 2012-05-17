@@ -55,6 +55,7 @@ namespace Login.Controllers
         /// Läd alle eigenen Stellenangebote in eine Liste und fügt sie der Partiellen View _StellenangeboteÜbersicht hinzu
         /// </summary>
         /// <returns></returns>
+        [Authorize(Roles = "Anbieter")]
         public PartialViewResult _StellenAngebotSteuerung()
         {
             string email = HttpContext.User.Identity.Name;
