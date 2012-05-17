@@ -72,13 +72,21 @@ namespace Login.Controllers
         {
             Stellenangebot aktStelle = DB.stellenangebotLesen(stelle.id);
 
-            ViewBag.Title = "Stellenangebot erstellen";
-            ViewBag.Methode = "NeueStelleSpeichern";
-            
+
+
 
             if (view == "anzeigen")
+            {
+                ViewBag.Title = "Stellenangebot erstellen";
+                ViewBag.Methode = "NeueStelleSpeichern";
                 return View("StellenAngebot", aktStelle);
-            return View("StellenangebotBearbeiten", aktStelle);
+            }
+            else
+            {
+                ViewBag.Title = "Stellenangebot bearbeiten";
+                ViewBag.Methode = "StelleAktualisieren";
+                return View("StellenangebotBearbeiten", aktStelle);
+            }
             
         }
 

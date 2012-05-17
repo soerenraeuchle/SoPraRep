@@ -18,6 +18,7 @@ namespace Login.Models
     {
         private DBManager() { }
         private static DBManager instance = null;
+        private static String dateFormat = "dd-MM-yyyy";
 
         //private static string ConnectionString = "Data Source=.\\SQLEXPRESS;AttachDbFilename=C:\\dev\\asp\\sopra\\Login\\Login\\App_Data\\Sopra.mdf;Integrated Security=True;User Instance=True";
         private static string ConnectionString = "Data Source=.\\SQLEXPRESS;AttachDbFilename=|DataDirectory|Sopra.mdf;Integrated Security=True;User Instance=True";
@@ -130,9 +131,6 @@ namespace Login.Models
         //--------------------------------------------------------------------------------------------------------------------
         public bool stellenangebotAktualisieren(Models.Stellenangebot stelle)
         {
-            string startAnstellung = stelle.startAnstellung.getDate();
-            string endeAnstellung = stelle.endeAnstellung.getDate();
-            string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
 
             string query = "UPDATE Stellenangebote SET " +
                                     "stellenName= @stellenName, " +
@@ -156,9 +154,9 @@ namespace Login.Models
                 cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
                 cmd.Parameters.AddWithValue("@institut", stelle.institut);
                 cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
-                cmd.Parameters.AddWithValue("@startanstellung", startAnstellung);
-                cmd.Parameters.AddWithValue("@endeAnstellung", endeAnstellung);
-                cmd.Parameters.AddWithValue("@bewerbungsfrist", bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@startanstellung", stelle.startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", stelle.endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", stelle.bewerbungsFrist);
                 cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
                 cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
                 cmd.Parameters.AddWithValue("@ort", stelle.ort);
@@ -181,10 +179,6 @@ namespace Login.Models
 
         public bool stellenangebotHinzufügen(Stellenangebot stelle)
         {
-            string startAnstellung = stelle.startAnstellung.getDate();
-            string endeAnstellung = stelle.endeAnstellung.getDate();
-            string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
-
             string query = "INSERT INTO Stellenangebote" +
                                     "(" +
                                         "stellenName, " +
@@ -220,9 +214,9 @@ namespace Login.Models
                 cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
                 cmd.Parameters.AddWithValue("@institut", stelle.institut);
                 cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
-                cmd.Parameters.AddWithValue("@startanstellung", startAnstellung);
-                cmd.Parameters.AddWithValue("@endeAnstellung", endeAnstellung);
-                cmd.Parameters.AddWithValue("@bewerbungsfrist", bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@startanstellung", stelle.startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", stelle.endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", stelle.bewerbungsFrist);
                 cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
                 cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
                 cmd.Parameters.AddWithValue("@ort", stelle.ort);
@@ -267,7 +261,6 @@ namespace Login.Models
         public Stellenangebot stellenangebotLesen(int stellenID)
         {
             Stellenangebot stelle = new Stellenangebot();
-            string dateformat = "dd-MM-yyyy";
 
             string query = "SELECT stellenName, " +
                 "beschreibung, institut, anbieterID, " +
@@ -291,9 +284,9 @@ namespace Login.Models
                     stelle.beschreibung = reader.GetValue(1).ToString();
                     stelle.institut = reader.GetValue(2).ToString();
                     stelle.anbieterID = Convert.ToInt32(reader.GetValue(3));
-                    stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
-                    stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
-                    stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
+                    stelle.startAnstellung = reader.GetDateTime(4);
+                    stelle.endeAnstellung = reader.GetDateTime(5);
+                    stelle.bewerbungsFrist = reader.GetDateTime(6);
                     stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
                     stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
                     stelle.ort = reader.GetValue(9).ToString();
@@ -316,7 +309,6 @@ namespace Login.Models
         public LinkedList<Stellenangebot> stellenangebotUebersichtLesen(int anbieterID)
         {
             LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
-            string dateformat = "dd-MM-yyyy";
 
             string query = "SELECT stellenName, " +
                 "beschreibung, institut, anbieterID, " +
@@ -342,9 +334,9 @@ namespace Login.Models
                         stelle.beschreibung = reader.GetValue(1).ToString();
                         stelle.institut = reader.GetValue(2).ToString();
                         stelle.anbieterID = anbieterID;
-                        stelle.startAnstellung = new Date(reader.GetDateTime(4).ToString(dateformat));
-                        stelle.endeAnstellung = new Date(reader.GetDateTime(5).ToString(dateformat));
-                        stelle.bewerbungsFrist = new Date(reader.GetDateTime(6).ToString(dateformat));
+                        stelle.startAnstellung =reader.GetDateTime(4);
+                        stelle.endeAnstellung = reader.GetDateTime(5);
+                        stelle.bewerbungsFrist = reader.GetDateTime(6);
                         stelle.monatsStunden = Convert.ToInt32(reader.GetValue(7));
                         stelle.anzahlOffeneStellen = Convert.ToInt32(reader.GetValue(8));
                         stelle.ort = reader.GetValue(9).ToString();

@@ -2,7 +2,6 @@
 
 @{
     ViewBag.Title = "Stellenangebot";
-    ViewBag.id = Model.id;
 }
 
 <h2>Stellenangebot</h2>
@@ -65,21 +64,22 @@
 
         <div class="input">
             @Html.LabelFor(model => model.startAnstellung)
-            <div id="startAnstellung">@Model.startAnstellung.day.@Model.startAnstellung.month.@Model.startAnstellung.year</div>
+            <div id="startAnstellung">@Model.startAnstellung.ToShortDateString()</div>
         </div>
 
         <div class="input">
             @Html.LabelFor(model => model.endeAnstellung)
-            <div id="endeAnstellung">@Model.endeAnstellung.day.@Model.endeAnstellung.month.@Model.endeAnstellung.year</div>
+            <div id="endeAnstellung">@Model.endeAnstellung.ToShortDateString()</div>
+            
         </div>
 
         <div class="input">
             @Html.LabelFor(model => model.bewerbungsFrist)
-            <div id="bewerbungsFrist">@Model.bewerbungsFrist.day.@Model.bewerbungsFrist.month.@Model.bewerbungsFrist.year</div>
+            <div id="bewerbungsFrist">@Model.bewerbungsFrist.ToShortDateString()</div>
         </div>
     </div>
 
-    @using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", FormMethod.Post, new {view = "bearbeiten" }))
+    @using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", FormMethod.Post, new { view = "bearbeiten" }))
     {
         @Html.HiddenFor(model => model.id)
         <input type="submit" value="Bearbeiten" />

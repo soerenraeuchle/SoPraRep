@@ -72,21 +72,62 @@
             @Html.ValidationMessageFor(model => model.institut)
         </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.startAnstellung)
-        </div>
-        <div class="editor-field">
+
+        <script>
+            $(function () {
+                var dates = $("#startAnstellung, #endeAnstellung").datepicker(
+                {
+                    defaultDate: "+1w",
+                    dateFormat: "dd.mm.yy",
+                    changeMonth: true,
+                    numberOfMonths: 3,
+                    onSelect: function (selectedDate) 
+                    {
+                        var option = this.id == "startAnstellung" ? "minDate" : "maxDate",
+					    instance = $(this).data("datepicker"),
+					    date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
+                });
+                var date = $("#bewerbungsFrist").datepicker(
+                {
+                    defaultDate: "+1w",
+                    dateFormat: "dd.mm.yy",
+                    changeMonth: true,
+                    numberOfMonths: 3,
+                    onSelect: function (selectedDate) {
+                        var option = this.id == "bewerbungsFrist" ? "minDate" : "maxDate",
+					    instance = $(this).data("datepicker"),
+					    date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
+                });
+            });
+	</script>
+
+
+
+<div class="demo">
+
+<div class="editor-label">
+            Die Anstellungsdauer geht
+
+            Von
             @Html.EditorFor(model => model.startAnstellung)
             @Html.ValidationMessageFor(model => model.startAnstellung)
-        </div>
 
-        <div class="editor-label">
-            @Html.LabelFor(model => model.endeAnstellung)
-        </div>
-        <div class="editor-field">
+            Bis
             @Html.EditorFor(model => model.endeAnstellung)
             @Html.ValidationMessageFor(model => model.endeAnstellung)
         </div>
+</div>
+
 
         <div class="editor-label">
             @Html.LabelFor(model => model.bewerbungsFrist)
