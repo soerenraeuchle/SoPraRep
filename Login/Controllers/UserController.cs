@@ -37,30 +37,54 @@ namespace Login.Controllers
             return View(model);
         }
 
+
         /// <summary>
-        /// fügt einen Benutzer der Datenbank hinzu und startet eine Session.
+        /// Fügt einen Bewerber der Datenbank hinzu und startet eine Session.
         /// öffnet die Hauptseite
         /// </summary>
         /// <param name="model">Register model</param>
         /// <returns>Index.cshtml</returns>
-        [HttpPost]
-        public ActionResult RegisterRolle(Benutzer model)
+        public ActionResult RegisterBewerber(Bewerber model)
         {
             if (ModelState.IsValid)
             {
-                if (model.rechte != 3) //Registrierung als Admin nicht zulassen.
+                if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
                 {
                     string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-                    if (DB.benutzerSpeichern(model))
+                    if (model.rechte == 0)
                     {
-                        FormsAuthentication.SetAuthCookie(model.email, false);
-                        //return RedirectToAction("Index");
+                        if (DB.bewerberSpeichern(model))
+                        {
+                            FormsAuthentication.SetAuthCookie(model.email, false);
+                        }
                     }
+                    
                 }
             }
            
             return RedirectToAction("Index");
         }
+
+
+        public ActionResult RegisterAnbieter(Anbieter model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.rechte != 3)
+                {
+                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
+
+                    if (DB.anbieterSpeichern(model))
+                    {
+                        FormsAuthentication.SetAuthCookie(model.email, false);
+                    }
+
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
 
         
         /// <summary>
@@ -74,26 +98,28 @@ namespace Login.Controllers
         /// </returns>
         public ActionResult RegisterRolle(int rechte)
         {
-            Benutzer model = new Benutzer();
-            model.rechte = rechte;
-            if (model.rechte == 0)
+            if (rechte == 0)
             {
-                return PartialView("_RegisterBewerber", model);
+                Bewerber bewerber = new Bewerber();
+                return PartialView("_RegisterBewerber", bewerber);
             }
             else
             {
-                return PartialView("_RegisterAnbieter", model);
+                Anbieter anbieter = new Anbieter();
+                return PartialView("_RegisterAnbieter", anbieter);
             }
         }
 
 
+        /// <summary>
+        /// Überprüft ob die Email schon in der Datenbank vorhanden ist.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>Ein Json Objekt</returns>
         public JsonResult EmailVorhanden(string email)
         {
-            string query = "SELECT id FROM Benutzer WHERE email='" + email + "'";
 
-            ArrayList daten = DB.auslesen(query);
-
-            if (daten.Count>0)
+            if (DB.emailVorhanden(email))
             {
                 return Json("Email schon vorhanden", JsonRequestBehavior.AllowGet);
             }
@@ -101,7 +127,7 @@ namespace Login.Controllers
 
         }
 
-        
+
         /// <summary>
         /// ruft die Kontodaten des eingeloggten Benutzers ab und gibt sie auf der
         /// Kontoseite zurück
@@ -110,45 +136,63 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
-            //string email = HttpContext.User.Identity.Name;
-            Benutzer benutzer = GetSessionBenutzer();
-            if (benutzer.rechte == 0)
+            string email = HttpContext.User.Identity.Name;
+            //BewerberKonto
+            if (Roles.GetRolesForUser(email)[0].Equals("Bewerber"))
             {
-                return RedirectToAction("KontoBewerber");
+                Bewerber benutzer = DB.bewerberAuslesen(email);
+                if (ModelState.IsValid)
+                {
+                    return View("KontoBewerber", benutzer);
+                }
             }
-            else
+            //AnbieterKonto
+            if (Roles.GetRolesForUser(email)[0].Equals("Anbieter"))
             {
-                return RedirectToAction("KontoAnbieter");
+                Anbieter benutzer = DB.anbieterAuslesen(email);
+                if (ModelState.IsValid)
+                {
+                    return View("KontoAnbieter", benutzer);
+                }
             }
+            return View("Index");
         }
 
 
         [Authorize]
-        public ActionResult KontoBewerber()
+        public ActionResult KontoBearbeiten()
         {
-            Benutzer benutzer = GetSessionBenutzer();
-            return View(benutzer);
+            string email = HttpContext.User.Identity.Name;
+            
+            //Bewerber 
+            if (Roles.GetRolesForUser(email)[0].Equals("Bewerber"))
+            {
+                return RedirectToAction("KontoBewerberBearbeiten");
+            }
+
+            //Anbieter
+            if (Roles.GetRolesForUser(email)[0].Equals("Anbieter"))
+            {
+                return RedirectToAction("KontoAnbieterBearbeiten");
+            }
+
+            return View("Fehler");
         }
 
 
-        [Authorize]
-        public ActionResult KontoAnbieter()
-        {
-            Benutzer benutzer = GetSessionBenutzer();
-            return View(benutzer);
-        }
+
 
         /// <summary>
         /// zeigt das Kontoformular an auf der die Benutzerdaten verändert werden können
         /// </summary>
         /// <returns>KontoBearbeiten.cshtml</returns>
-        [Authorize(Roles = "Anbieter")]
-        public ActionResult KontoBearbeiten()
+        [Authorize(Roles="Bewerber")]
+        public ActionResult KontoBewerberBearbeiten()
         {
-            //string email = HttpContext.User.Identity.Name;
-            Benutzer benutzer = GetSessionBenutzer();
-
+            string email = HttpContext.User.Identity.Name;
+            Bewerber benutzer = DB.bewerberAuslesen(email);
             return View(benutzer);
+            
         }
         
         /// <summary>
@@ -157,27 +201,52 @@ namespace Login.Controllers
         /// </summary>
         /// <param name="user">Benutzer model</param>
         /// <returns>Konto.cshtml</returns>
+        
         [HttpPost]
-        [Authorize(Roles="Anbieter")]
-        public ActionResult KontoBearbeiten(Benutzer user)
+        [Authorize(Roles = "Bewerber")]
+        public ActionResult KontoBewerberBearbeiten(Bewerber benutzer)
         {
-            user.email = HttpContext.User.Identity.Name;
+            //benutzer.email = HttpContext.User.Identity.Name;
 
-            string query = "UPDATE Benutzer SET " +
-                                "vorname='" + user.vorname + "', " +
-                                "nachname='" + user.nachname + "', " +
-                                "strasse='" + user.strasse + "', " +
-                                "hausnummer='" + user.hausnummer + "', " +
-                                "plz='" + user.plz + "', " +
-                                "wohnort='" + user.wohnort + "', " +
-                                "matrikelnummer='" + user.matrikelnummer + "', " +
-                                "studiengang='" + user.studiengang + "', " +
-                                "fachsemester='" + user.fachsemester + "' " +
-                            "WHERE email='" + user.email + "'";
+            if (ModelState.IsValid)
+            {
+                DB.bewerberAktualisieren(benutzer);
+                return RedirectToAction("Konto");
+            }
 
-            DB.aendern(query);
+            return RedirectToAction("Fehler");
+            
+        }
 
-            return RedirectToAction("Konto");
+        [Authorize(Roles = "Anbieter")]
+        public ActionResult KontoAnbieterBearbeiten()
+        {
+            string email = HttpContext.User.Identity.Name;
+            Anbieter benutzer = DB.anbieterAuslesen(email);
+            return View(benutzer);
+
+        }
+
+        /// <summary>
+        /// Übernimmt die vom Benutzer in die KontoBearbeiten Seite eingetragenen Änderungen
+        /// in die Datenbank und leitet den Benutzer auf die Konto Seite weiter
+        /// </summary>
+        /// <param name="user">Benutzer model</param>
+        /// <returns>Konto.cshtml</returns>
+
+        [HttpPost]
+        [Authorize(Roles = "Anbieter")]
+        public ActionResult KontoAnbieterBearbeiten(Anbieter benutzer)
+        {
+
+            if (ModelState.IsValid)
+            {
+                DB.anbieterAktualisieren(benutzer);
+                return RedirectToAction("Konto");
+            }
+
+            return RedirectToAction("Fehler");
+
         }
 
         /// <summary>
@@ -187,46 +256,47 @@ namespace Login.Controllers
         /// <param name="user">Login model</param>
         /// <returns>Index.cshtml</returns>
         [HttpPost]
-        public ActionResult Login(Login.Models.Login user)
+        public ActionResult Login(Login.Models.Login login)
         {
-            user.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
+            login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
-                string query = "SELECT passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
-                ArrayList daten = DB.auslesen(query);
-                if (daten == null)
-                {
-                    return View("index"); //Fehlerbehandlung
-                }
-                
-                if (daten.Count != 0)
-                {
-                    ArrayList zeile = (ArrayList)daten[0];
+                Benutzer check = DB.benutzerAuslesen(login.Email);
 
-                    string pw = (string)zeile[0];
-                    int rechte = (int)zeile[1];
-
-                    if (user.Passwort == pw)
-                    {
-                        FormsAuthentication.SetAuthCookie(user.Email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
-                        Benutzer benutzer = new Benutzer();
-                        benutzer.email = user.Email;
-                        benutzer.passwort = user.Passwort;
-                        benutzer.rechte = rechte;
-                        HttpContext.Session["benutzer"] = benutzer;
-
-                        return RedirectToAction("index", "User");
-                    }
-                    
-                    ModelState.AddModelError("", "Passwort falsch");
-                    
-
-                }
-                else
+                //schauen ob Emailadresse vorhanden
+                if (String.IsNullOrEmpty(check.email))
                 {
                     ModelState.AddModelError("", "Emailadresse existiert nicht");
                 }
+                else
+                {
+                    //passwörter vergleichen und benutzer auslesen
+                    if (check.passwort.Equals(login.Passwort))
+                    {
+                        //je nach Rolle auslesen und cookie setzen
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Bewerber"))
+                        {
+                            Bewerber benutzer = DB.bewerberAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Anbieter"))
+                        {
+                            Anbieter benutzer = DB.anbieterAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+
+                        return RedirectToAction("index", "User");
+
+                    }
+                    else
+                    {
+                        //passwort falsch
+                        ModelState.AddModelError("", "Passwort falsch");
+                    }
+                }
+                
 
             }
            
@@ -246,146 +316,6 @@ namespace Login.Controllers
         }
 
 
-        /// <summary>
-        /// Speichert den Benutzer in die Datenbank
-        /// </summary>
-        /// <param name="user">Register model</param>
-        /// <returns>Boolean erfolgreich</returns>
-        //private bool benutzerSpeichern(Benutzer user)
-        //{
-        //    string query;
-        //    user.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.passwort, "SHA1");
-        //    Object[] values;
-
-        //    if (user.rechte == 0)
-        //    {
-        //        user.freischaltung = true;
-        //        query =     "INSERT INTO " +
-        //                        "Benutzer " +
-        //                            "(" +
-        //                                "vorname, " +
-        //                                "nachname, " +
-
-        //                                "email, " +
-        //                                "passwort, " +
-
-        //                                "rechte, " +
-        //                                "freischaltung, " +
-
-        //                                "studiengang, " +
-        //                                "fachsemester, " +
-
-        //                                "strasse, " +
-        //                                "hausnummer, " +
-        //                                "plz, " +
-        //                                "wohnort, " +
-
-        //                                "matrikelnummer " +
-        //                            ") " +
-        //                        "VALUES " +
-        //                            "(" +
-        //                                "'" + user.vorname + "', " +
-        //                                "'" + user.nachname + "', " +
-        //                                "'" + user.email + "', " +
-        //                                "'" + user.passwort + "', " +
-
-        //                                user.rechte + ", " +
-        //                                "'" + user.freischaltung + "', " +
-
-        //                                "'" + user.studiengang + "', " +
-        //                                user.fachsemester + ", " +
-        //                                "'" + user.strasse + "', " +
-        //                                "'" + user.hausnummer + "', " +
-        //                                user.plz + ", " +
-        //                                "'" + user.wohnort + "', " +
-
-        //                                user.matrikelnummer + " " +
-
-        //                            ")";
-        //        values = new Object[1];
-        //    }
-        //    else
-        //    {
-        //        user.freischaltung = false;
-
-        //        query =     "INSERT INTO " +
-        //                        "Benutzer " +
-        //                            "(" +
-        //                                "vorname, " +
-        //                                "nachname, " +
-
-        //                                "email, " +
-        //                                "passwort, " +
-
-        //                                "rechte, " +
-        //                                "freischaltung, " +
-
-        //                                "institut " +
-        //                                //"stellvertreterID" + Achtung Komma nach institut gelöscht
-        //                            ") " +
-        //                        "VALUES " +
-        //                            "(" +
-        //                                "'" + user.vorname + "', " +
-        //                                "'" + user.nachname + "', " +
-        //                                "'" + user.email + "', " +
-        //                                "'" + user.passwort + "', " +
-
-        //                                user.rechte + ", " +
-        //                                "'" + user.freischaltung + "', " +
-
-        //                                "'" + user.institut + "' " +
-
-        //                                //user.stellvertreterID + Achtung Komma nach institut gelöscht
-
-        //                            ")";
-                    
-        //    }
-
-            
-        //    //int affectedRows = DB.aendernPrepared(query, values);
-        //    if (affectedRows == -1)
-        //    {
-        //        return false;
-        //    }
-        //    return true;
-        //}
-
-        //TODO
-        [Authorize]
-        private Benutzer GetSessionBenutzer()
-        {
-            Benutzer user = new Benutzer();
-            user = (Benutzer)HttpContext.Session["benutzer"];
-
-            string query;
-            if (user.rechte == 0)
-            {
-                query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
-            }
-            else
-            {
-                query = "SELECT vorname, nachname, institut FROM Benutzer WHERE email='" + user.email + "'";
-            }
-            ArrayList daten = DB.auslesen(query);
-            ArrayList zeile = (ArrayList)daten[0];
-            user.vorname = (string)zeile[0];
-            user.nachname = (string)zeile[1];
-            if (user.rechte == 0)
-            {
-                user.strasse = (string)zeile[2];
-                user.hausnummer = (string)zeile[3];
-                user.plz = (int)zeile[4];
-                user.wohnort = (string)zeile[5];
-                user.matrikelnummer = (int)zeile[6];
-                user.studiengang = (string)zeile[7];
-                user.fachsemester = (int)zeile[8];
-            }
-            else
-            {
-                user.institut = (string)zeile[2];
-            }
-            
-            return user;
-        }
+       
     }
 }

@@ -10,8 +10,20 @@ using System.Web.Mvc;
 
 namespace Login.Models
 {
+    public class Login
+    {
+        [Required]
+        [Email]
+        public string Email { get; set; }
+
+        [Required]
+        [DataType(DataType.Password)]
+        public string Passwort { get; set; }
+    }
+
     public class Benutzer
     {
+       
         [Integer]
         public int id { get; set; }
 
@@ -25,21 +37,6 @@ namespace Login.Models
         [StringLength(50)]
         public string nachname { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string strasse { get; set; }
-
-        [Required]
-        [Integer]
-        public string hausnummer { get; set; }
-
-        [Required]
-        [Integer]
-        public int plz { get; set; }
-
-        [Required]
-        [StringLength(50)]
-        public string wohnort { get; set; }
 
         //---------------Login relevant--------------------------------------
 
@@ -58,16 +55,7 @@ namespace Login.Models
         [StringLength(50)]
         public string confirmPasswort { get; set; }
 
-        //---------------Studium Daten--------------------------------------
-
-        [Integer]
-        public int matrikelnummer { get; set; }
-
-        [StringLength(50)]
-        public string studiengang { get; set; }
-
-        [Integer]
-        public int fachsemester { get; set; }
+        
 
         //---------------Rechte Vergabe--------------------------------------
 
@@ -77,12 +65,61 @@ namespace Login.Models
         
         public bool freischaltung { get; set; }
 
-        //---------------Veranstalter relevant--------------------------------------
+        
+    }
 
+    public class Anbieter : Benutzer
+    {
+        //---------------Veranstalter relevant--------------------------------------
+        public Anbieter()
+        {
+            this.rechte = 1;
+            this.stellvertreterID = -1;
+        }
+
+        [Required]
         [StringLength(50)]
         public string institut { get; set; }
 
         [Integer]
         public int stellvertreterID { get; set; }
+
+
+    }
+
+    public class Bewerber : Benutzer
+    {
+        public Bewerber()
+        {
+            this.rechte = 0;
+        }
+        [Required]
+        [StringLength(50)]
+        public string strasse { get; set; }
+
+        [Required]
+        [Integer]
+        public string hausnummer { get; set; }
+
+        [Required]
+        [Integer]
+        public int plz { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string wohnort { get; set; }
+
+        //---------------Studium Daten--------------------------------------
+        [Required]
+        [Integer]
+        public int matrikelnummer { get; set; }
+
+        [Required]
+        [StringLength(50)]
+        public string studiengang { get; set; }
+
+        [Required]
+        [Integer]
+        public int fachsemester { get; set; }
     }
 }

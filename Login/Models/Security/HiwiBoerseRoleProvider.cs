@@ -24,14 +24,11 @@ namespace Login.Models.Security
         {
             DBManager db = DBManager.getInstanz();
 
-            String query = "SELECT rechte FROM benutzer WHERE email='"+ email + "'";
-            ArrayList daten = db.auslesen(query);
+            int rechte = db.rechteFuerBenutzer(email);
             
-            if (daten.Count > 0) 
+            if (rechte != -1) 
             {
-                ArrayList zeile = (ArrayList)daten[0];
-                int rolle = (int)zeile[0];
-                return new string[] { (string)rollen[rolle] }; ;
+                return new string[] { (string)rollen[rechte] }; ;
             }
             return new string[] { }; ;
 
@@ -44,14 +41,15 @@ namespace Login.Models.Security
             
             DBManager db = DBManager.getInstanz();
 
-            String query = "SELECT rechte FROM benutzer WHERE email='"+ email + "'";
-            ArrayList daten = db.auslesen(query);
-            
-            if (daten.Count > 0) 
+            int rechte = db.rechteFuerBenutzer(email);
+
+            if (rechte != -1) 
             {
-                ArrayList zeile = (ArrayList)daten[0];
-                userRolle = (string)rollen[(int)zeile[0]] ;
-                return rollen.Contains(userRolle);
+                userRolle = (string)rollen[rechte] ;
+                if (userRolle.Equals(rolle))
+                {
+                    return true;
+                }
             }
             return false;
             
