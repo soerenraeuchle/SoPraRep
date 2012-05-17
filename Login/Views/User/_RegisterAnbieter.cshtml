@@ -1,0 +1,67 @@
+﻿@model Login.Models.Anbieter
+
+@{
+    ViewBag.Title = "_RegistrierungAnbieter";
+}
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm("RegisterAnbieter", "User"))
+{
+    @Html.ValidationSummary(true)
+
+    <div id="name" class="gruppe">
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.vorname)
+            @Html.EditorFor(model => model.vorname)
+            @Html.ValidationMessageFor(model => model.vorname)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.nachname)
+            @Html.EditorFor(model => model.nachname)
+            @Html.ValidationMessageFor(model => model.nachname)
+        </div>
+    </div>
+
+   
+
+    <div id="uni" class="gruppe">
+        <h3>Identifikation</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.institut)
+            @Html.EditorFor(model => model.institut)
+            @Html.ValidationMessageFor(model => model.institut)
+        </div>
+    </div>
+
+    <div id="account" class="gruppe">
+        <h3>Account</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.email)
+            @Html.EditorFor(model => model.email)
+            @Html.ValidationMessageFor(model => model.email)
+        </div>
+
+        <br />
+
+        <div class="input">
+            @Html.LabelFor(model => model.passwort)
+            @Html.PasswordFor(model => model.passwort)
+            @Html.ValidationMessageFor(model => model.passwort)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.confirmPasswort)
+            @Html.PasswordFor(model => model.confirmPasswort)
+            @Html.ValidationMessageFor(model => model.confirmPasswort)
+        </div>
+    </div>
+
+    <div class="button gruppe">
+        <input type="button" id="registerFormularZurueck" value="zur&uuml;ck" />
+        <input type="submit" id="registerFormularWeiter" value="registrieren" />
+    </div>
+}
