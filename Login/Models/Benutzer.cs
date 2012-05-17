@@ -24,7 +24,7 @@ namespace Login.Models
     public class Benutzer
     {
        
-        [Integer]
+
         public int id { get; set; }
 
         //---------------Persönliche Daten--------------------------------------
@@ -62,12 +62,7 @@ namespace Login.Models
         [Integer]
         public int rechte { get; set; }
 
-<<<<<<< HEAD
-        public bool freischaltung { get; set; }
 
-        [StringLength(50)]
-=======
-        
         public bool freischaltung { get; set; }
 
         
@@ -82,16 +77,13 @@ namespace Login.Models
             this.stellvertreterID = -1;
         }
 
->>>>>>> origin/michi
+
         [Required]
         [StringLength(50)]
         public string institut { get; set; }
 
         [Integer]
         public int stellvertreterID { get; set; }
-<<<<<<< HEAD
-
-=======
 
 
     }
@@ -107,7 +99,7 @@ namespace Login.Models
         public string strasse { get; set; }
 
         [Required]
->>>>>>> origin/michi
+
         [Integer]
         public string hausnummer { get; set; }
 
@@ -121,9 +113,9 @@ namespace Login.Models
 
         //---------------Studium Daten--------------------------------------
         [Required]
-<<<<<<< HEAD
-        public string fachsemester { get; set; }
-=======
+        [Integer]
+        public int fachsemester { get; set; }
+
         [Integer]
         public int matrikelnummer { get; set; }
 
@@ -131,9 +123,5 @@ namespace Login.Models
         [StringLength(50)]
         public string studiengang { get; set; }
 
-        [Required]
-        [Integer]
-        public int fachsemester { get; set; }
->>>>>>> origin/michi
     }
 }
