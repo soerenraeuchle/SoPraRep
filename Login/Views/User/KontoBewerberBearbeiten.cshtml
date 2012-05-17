@@ -1,0 +1,85 @@
+﻿@model Login.Models.Bewerber
+
+@{
+    ViewBag.Title = "KontoBearbeiten";
+}
+
+<h2>Mein Konto bearbeiten</h2>
+
+<div id="kontoEdit" class="konto">
+@using (Html.BeginForm())
+{
+    <div id="name" class="gruppe">
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.vorname)
+            @Html.EditorFor(model => model.vorname)
+            @Html.ValidationMessageFor(model => model.vorname)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.nachname)
+            @Html.EditorFor(model => model.nachname)
+            @Html.ValidationMessageFor(model => model.nachname)
+        </div>
+    </div>
+
+    <div id="adresse" class="gruppe">
+        <h3>Adresse</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.strasse)
+            @Html.EditorFor(model => model.strasse)
+            @Html.ValidationMessageFor(model => model.strasse)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.hausnummer)
+            @Html.EditorFor(model => model.hausnummer)
+            @Html.ValidationMessageFor(model => model.hausnummer)
+        </div>
+
+        <br />
+
+        <div class="input">
+            @Html.LabelFor(model => model.plz)
+            @Html.EditorFor(model => model.plz)
+            @Html.ValidationMessageFor(model => model.plz)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.wohnort)
+            @Html.EditorFor(model => model.wohnort)
+            @Html.ValidationMessageFor(model => model.wohnort)
+        </div>
+
+                
+    </div>
+
+    <div id="uni" class="gruppe">
+        <h3>Identifikation</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.matrikelnummer)
+            @Html.EditorFor(model => model.matrikelnummer)
+            @Html.ValidationMessageFor(model => model.matrikelnummer)
+        </div>
+                
+        <div class="input">
+            @Html.LabelFor(model => model.studiengang)
+            @Html.EditorFor(model => model.studiengang)
+            @Html.ValidationMessageFor(model => model.studiengang)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.fachsemester)
+            @Html.EditorFor(model => model.fachsemester)
+            @Html.ValidationMessageFor(model => model.fachsemester)
+        </div>
+
+        @Html.HiddenFor(model => model.passwort)
+        @Html.HiddenFor(model => model.confirmPasswort)
+        @Html.HiddenFor(model => model.email)
+    </div>
+
+    <input type="submit" id="editKonto" value="speichern" />
+}
+</div>

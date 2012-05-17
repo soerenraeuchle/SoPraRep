@@ -80,8 +80,8 @@
     <Compile Include="Models\Benutzer.cs" />
     <Compile Include="Models\Bewerbung.cs" />
     <Compile Include="Models\Date.cs" />
-    <Compile Include="Models\Login.cs" />
     <Compile Include="Models\DBManager.cs" />
+    <Compile Include="Models\Security\HiwiBoerseRoleProvider.cs" />
     <Compile Include="Models\Stellenangebot.cs" />
     <Compile Include="Models\StellenangebotUebersicht.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -145,6 +145,7 @@
     <Content Include="Scripts\jquery.validate-vsdoc.js" />
     <Content Include="Scripts\jquery.validate.js" />
     <Content Include="Scripts\jquery.validate.min.js" />
+    <Content Include="Scripts\js\verarbeiteRegNav.js" />
     <Content Include="Scripts\modernizr-1.7.js" />
     <Content Include="Scripts\modernizr-1.7.min.js" />
     <Content Include="Web.config">
@@ -193,7 +194,22 @@
     <Content Include="Views\User\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\User\KontoBearbeiten.cshtml" />
+    <Content Include="Views\User\_RegisterBewerber.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\_RegisterAnbieter.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoBewerber.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoAnbieter.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoBewerberBearbeiten.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <Content Include="Views\User\KontoAnbieterBearbeiten.cshtml" />
   </ItemGroup>
   <ItemGroup>
     <Content Include="Views\User\KontoEdit.cshtml" />

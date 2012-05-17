@@ -6,6 +6,7 @@ using System.Web.Mvc;
 using Login.Models;
 using System.Web.Security;
 using System.Data.SqlClient;
+using System.Collections;
 
 namespace Login.Controllers
 {
@@ -15,7 +16,11 @@ namespace Login.Controllers
     public class UserController : Controller
     {
         DBManager DB = DBManager.getInstanz();
+<<<<<<< HEAD
 
+=======
+        
+>>>>>>> origin/michi
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
         /// </summary>
@@ -45,15 +50,16 @@ namespace Login.Controllers
             return View(model);
         }
 
+
         /// <summary>
-        /// fügt einen Benutzer der Datenbank hinzu und startet eine Session.
+        /// Fügt einen Bewerber der Datenbank hinzu und startet eine Session.
         /// öffnet die Hauptseite
         /// </summary>
         /// <param name="model">Register model</param>
         /// <returns>Index.cshtml</returns>
-        [HttpPost]
-        public ActionResult Register(Benutzer model)
+        public ActionResult RegisterBewerber(Bewerber model)
         {
+<<<<<<< HEAD
             string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
             DB.aendern("INSERT INTO " +
                             "Benutzer " +
@@ -63,7 +69,86 @@ namespace Login.Controllers
                                     "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
                                     model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
 
+=======
+            if (ModelState.IsValid)
+            {
+                if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
+                {
+                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
+                    if (model.rechte == 0)
+                    {
+                        if (DB.bewerberSpeichern(model))
+                        {
+                            FormsAuthentication.SetAuthCookie(model.email, false);
+                        }
+                    }
+                    
+                }
+            }
+           
+>>>>>>> origin/michi
             return RedirectToAction("Index");
+        }
+
+
+        public ActionResult RegisterAnbieter(Anbieter model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.rechte != 3)
+                {
+                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
+
+                    if (DB.anbieterSpeichern(model))
+                    {
+                        FormsAuthentication.SetAuthCookie(model.email, false);
+                    }
+
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+
+        
+        /// <summary>
+        /// Gibt das zum Wert passende Formular zurück.
+        /// </summary>
+        /// <param name="rechte">
+        /// Wert der die Rechte des Benutzers beschreibt.
+        /// </param>
+        /// <returns>
+        /// Formular
+        /// </returns>
+        public ActionResult RegisterRolle(int rechte)
+        {
+            if (rechte == 0)
+            {
+                Bewerber bewerber = new Bewerber();
+                return PartialView("_RegisterBewerber", bewerber);
+            }
+            else
+            {
+                Anbieter anbieter = new Anbieter();
+                return PartialView("_RegisterAnbieter", anbieter);
+            }
+        }
+
+
+        /// <summary>
+        /// Überprüft ob die Email schon in der Datenbank vorhanden ist.
+        /// </summary>
+        /// <param name="email"></param>
+        /// <returns>Ein Json Objekt</returns>
+        public JsonResult EmailVorhanden(string email)
+        {
+
+            if (DB.emailVorhanden(email))
+            {
+                return Json("Email schon vorhanden", JsonRequestBehavior.AllowGet);
+            }
+            return Json(true, JsonRequestBehavior.AllowGet);
 
         }
 
@@ -76,6 +161,7 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
+<<<<<<< HEAD
             Benutzer user = new Benutzer();
             user.email = HttpContext.User.Identity.Name;
 
@@ -95,16 +181,62 @@ namespace Login.Controllers
             reader.Close();
 
             return View(user);
+=======
+            string email = HttpContext.User.Identity.Name;
+            //BewerberKonto
+            if (Roles.GetRolesForUser(email)[0].Equals("Bewerber"))
+            {
+                Bewerber benutzer = DB.bewerberAuslesen(email);
+                if (ModelState.IsValid)
+                {
+                    return View("KontoBewerber", benutzer);
+                }
+            }
+            //AnbieterKonto
+            if (Roles.GetRolesForUser(email)[0].Equals("Anbieter"))
+            {
+                Anbieter benutzer = DB.anbieterAuslesen(email);
+                if (ModelState.IsValid)
+                {
+                    return View("KontoAnbieter", benutzer);
+                }
+            }
+            return View("Index");
+>>>>>>> origin/michi
         }
+
+
+        [Authorize]
+        public ActionResult KontoBearbeiten()
+        {
+            string email = HttpContext.User.Identity.Name;
+            
+            //Bewerber 
+            if (Roles.GetRolesForUser(email)[0].Equals("Bewerber"))
+            {
+                return RedirectToAction("KontoBewerberBearbeiten");
+            }
+
+            //Anbieter
+            if (Roles.GetRolesForUser(email)[0].Equals("Anbieter"))
+            {
+                return RedirectToAction("KontoAnbieterBearbeiten");
+            }
+
+            return View("Fehler");
+        }
+
+
 
 
         /// <summary>
         /// zeigt das Kontoformular an auf der die Benutzerdaten verändert werden können
         /// </summary>
         /// <returns>KontoBearbeiten.cshtml</returns>
-        [Authorize]
-        public ActionResult KontoBearbeiten()
+        [Authorize(Roles="Bewerber")]
+        public ActionResult KontoBewerberBearbeiten()
         {
+<<<<<<< HEAD
             Benutzer user = new Benutzer();
             user.email = HttpContext.User.Identity.Name;
 
@@ -124,6 +256,44 @@ namespace Login.Controllers
             reader.Close();
 
             return View(user);
+=======
+            string email = HttpContext.User.Identity.Name;
+            Bewerber benutzer = DB.bewerberAuslesen(email);
+            return View(benutzer);
+            
+        }
+        
+        /// <summary>
+        /// Übernimmt die vom Benutzer in die KontoBearbeiten Seite eingetragenen Änderungen
+        /// in die Datenbank und leitet den Benutzer auf die Konto Seite weiter
+        /// </summary>
+        /// <param name="user">Benutzer model</param>
+        /// <returns>Konto.cshtml</returns>
+        
+        [HttpPost]
+        [Authorize(Roles = "Bewerber")]
+        public ActionResult KontoBewerberBearbeiten(Bewerber benutzer)
+        {
+            //benutzer.email = HttpContext.User.Identity.Name;
+
+            if (ModelState.IsValid)
+            {
+                DB.bewerberAktualisieren(benutzer);
+                return RedirectToAction("Konto");
+            }
+
+            return RedirectToAction("Fehler");
+            
+        }
+
+        [Authorize(Roles = "Anbieter")]
+        public ActionResult KontoAnbieterBearbeiten()
+        {
+            string email = HttpContext.User.Identity.Name;
+            Anbieter benutzer = DB.anbieterAuslesen(email);
+            return View(benutzer);
+
+>>>>>>> origin/michi
         }
 
         /// <summary>
@@ -132,10 +302,12 @@ namespace Login.Controllers
         /// </summary>
         /// <param name="user">Benutzer model</param>
         /// <returns>Konto.cshtml</returns>
+
         [HttpPost]
-        [Authorize]
-        public ActionResult KontoBearbeiten(Benutzer user)
+        [Authorize(Roles = "Anbieter")]
+        public ActionResult KontoAnbieterBearbeiten(Anbieter benutzer)
         {
+<<<<<<< HEAD
             user.email = HttpContext.User.Identity.Name;
 
             string query = "UPDATE Benutzer SET " +
@@ -152,6 +324,17 @@ namespace Login.Controllers
 
             DB.aendern(query);
             return RedirectToAction("Konto");
+=======
+
+            if (ModelState.IsValid)
+            {
+                DB.anbieterAktualisieren(benutzer);
+                return RedirectToAction("Konto");
+            }
+
+            return RedirectToAction("Fehler");
+
+>>>>>>> origin/michi
         }
 
         /// <summary>
@@ -161,14 +344,15 @@ namespace Login.Controllers
         /// <param name="user">Login model</param>
         /// <returns>Index.cshtml</returns>
         [HttpPost]
-        public ActionResult Login(Login.Models.Login user)
+        public ActionResult Login(Login.Models.Login login)
         {
-            string password = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
+            login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
 
             
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
+<<<<<<< HEAD
                 string query = "SELECT id, passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
                 SqlDataReader reader = DB.auslesen(query);
                 reader.Read();
@@ -186,9 +370,35 @@ namespace Login.Controllers
                         authCookie.Value = FormsAuthentication.Encrypt(newTicket);
                         Response.Cookies.Add(authCookie);
                         //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+=======
+                Benutzer check = DB.benutzerAuslesen(login.Email);
 
-                        reader.Close();
+                //schauen ob Emailadresse vorhanden
+                if (String.IsNullOrEmpty(check.email))
+                {
+                    ModelState.AddModelError("", "Emailadresse existiert nicht");
+                }
+                else
+                {
+                    //passwörter vergleichen und benutzer auslesen
+                    if (check.passwort.Equals(login.Passwort))
+                    {
+                        //je nach Rolle auslesen und cookie setzen
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Bewerber"))
+                        {
+                            Bewerber benutzer = DB.bewerberAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Anbieter"))
+                        {
+                            Anbieter benutzer = DB.anbieterAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+>>>>>>> origin/michi
+
                         return RedirectToAction("index", "User");
+<<<<<<< HEAD
                     }
                 }
                 else
@@ -196,6 +406,18 @@ namespace Login.Controllers
 
                 }
                 reader.Close();
+=======
+
+                    }
+                    else
+                    {
+                        //passwort falsch
+                        ModelState.AddModelError("", "Passwort falsch");
+                    }
+                }
+                
+
+>>>>>>> origin/michi
             }
             else
             {
@@ -217,6 +439,7 @@ namespace Login.Controllers
         }
 
 
+<<<<<<< HEAD
         /// <summary>
         /// Speichert den Benutzer in die Datenbank
         /// </summary>
@@ -297,5 +520,8 @@ namespace Login.Controllers
         {
             return true;
         }
+=======
+       
+>>>>>>> origin/michi
     }
 }
