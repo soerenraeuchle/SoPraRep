@@ -1,0 +1,148 @@
+﻿@model Login.Models.Stellenangebot
+
+@{
+    ViewBag.Title = ViewBag.Title;
+}
+
+<h2>@ViewBag.Title</h2>
+
+<script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
+<script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
+
+@using (Html.BeginForm((string)ViewBag.Methode, "AngeboteManager", FormMethod.Post))
+{
+    @Html.HiddenFor(model => model.id)
+
+    @Html.ValidationSummary(true)
+    <fieldset>
+        <legend>Stellenangebot</legend>
+        <div class="editor-label">
+            @Html.LabelFor(model => model.stellenName)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.stellenName)
+            @Html.ValidationMessageFor(model => model.stellenName)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.ort)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.ort)
+            @Html.ValidationMessageFor(model => model.ort)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.beschreibung)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.beschreibung)
+            @Html.ValidationMessageFor(model => model.beschreibung)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.vorraussetzungen)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.vorraussetzungen)
+            @Html.ValidationMessageFor(model => model.vorraussetzungen)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.monatsStunden)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.monatsStunden)
+            @Html.ValidationMessageFor(model => model.monatsStunden)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.anzahlOffeneStellen)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.anzahlOffeneStellen)
+            @Html.ValidationMessageFor(model => model.anzahlOffeneStellen)
+        </div>
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.institut)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.institut)
+            @Html.ValidationMessageFor(model => model.institut)
+        </div>
+
+
+        <script>
+            $(function () {
+                var dates = $("#startAnstellung, #endeAnstellung").datepicker(
+                {
+                    defaultDate: "+1w",
+                    dateFormat: "dd.mm.yy",
+                    changeMonth: true,
+                    numberOfMonths: 3,
+                    onSelect: function (selectedDate) 
+                    {
+                        var option = this.id == "startAnstellung" ? "minDate" : "maxDate",
+					    instance = $(this).data("datepicker"),
+					    date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
+                });
+                var date = $("#bewerbungsFrist").datepicker(
+                {
+                    defaultDate: "+1w",
+                    dateFormat: "dd.mm.yy",
+                    changeMonth: true,
+                    numberOfMonths: 3,
+                    onSelect: function (selectedDate) {
+                        var option = this.id == "bewerbungsFrist" ? "minDate" : "maxDate",
+					    instance = $(this).data("datepicker"),
+					    date = $.datepicker.parseDate(
+						instance.settings.dateFormat ||
+						$.datepicker._defaults.dateFormat,
+						selectedDate, instance.settings);
+                        dates.not(this).datepicker("option", option, date);
+                    }
+                });
+            });
+	</script>
+
+
+
+<div class="demo">
+
+<div class="editor-label">
+            Die Anstellungsdauer geht
+
+            Von
+            @Html.EditorFor(model => model.startAnstellung)
+            @Html.ValidationMessageFor(model => model.startAnstellung)
+
+            Bis
+            @Html.EditorFor(model => model.endeAnstellung)
+            @Html.ValidationMessageFor(model => model.endeAnstellung)
+        </div>
+</div>
+
+
+        <div class="editor-label">
+            @Html.LabelFor(model => model.bewerbungsFrist)
+        </div>
+        <div class="editor-field">
+            @Html.EditorFor(model => model.bewerbungsFrist)
+            @Html.ValidationMessageFor(model => model.bewerbungsFrist)
+        </div>
+
+        <p>
+            <input type="submit" value="Speichern" />
+        </p>
+    </fieldset>
+}
+
+<div>
+    @Html.ActionLink("Back to List", "Index")
+</div>

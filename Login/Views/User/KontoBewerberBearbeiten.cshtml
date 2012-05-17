@@ -1,13 +1,13 @@
-﻿@model Login.Models.Benutzer
+﻿@model Login.Models.Bewerber
 
 @{
-    ViewBag.Title = "KontoEdit";
+    ViewBag.Title = "KontoBearbeiten";
 }
 
 <h2>Mein Konto bearbeiten</h2>
 
 <div id="kontoEdit" class="konto">
-@using (Html.BeginForm("KontoEdit", "User", FormMethod.Post))
+@using (Html.BeginForm())
 {
     <div id="name" class="gruppe">
         <h3>Name</h3>
@@ -74,6 +74,10 @@
             @Html.EditorFor(model => model.fachsemester)
             @Html.ValidationMessageFor(model => model.fachsemester)
         </div>
+
+        @Html.HiddenFor(model => model.passwort)
+        @Html.HiddenFor(model => model.confirmPasswort)
+        @Html.HiddenFor(model => model.email)
     </div>
 
     <input type="submit" id="editKonto" value="speichern" />

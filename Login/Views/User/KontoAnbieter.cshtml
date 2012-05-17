@@ -1,0 +1,36 @@
+﻿@model Login.Models.Anbieter
+
+@{
+    ViewBag.Title = "Konto";
+}
+
+<h2>Konto</h2>
+
+<div id="kontoMain" class="konto">
+    <div id="name" class="gruppe">
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.vorname)
+            <div id="vorname">@Model.vorname</div>
+            
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.nachname)
+            <div id="nachname">@Model.nachname</div>
+
+        </div>
+    </div>
+
+    <div id="uni" class="gruppe">
+        <h3>Identifikation</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.institut)
+            <div id="matrikelnummer">@Model.institut</div>
+        </div>
+        
+    </div>
+
+    
+
+</div>

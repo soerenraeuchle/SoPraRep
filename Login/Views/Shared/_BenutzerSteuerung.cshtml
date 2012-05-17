@@ -22,6 +22,11 @@
     <input type="submit" value="Konto" />
 }
 
+@using (Html.BeginForm("KontoBearbeiten", "User"))
+{
+    <input type="submit" value="KontoBearbeiten" />
+}
+
 @using (Html.BeginForm("Logout", "User", FormMethod.Post))
 {
     <input type="submit" value="Abmelden" />

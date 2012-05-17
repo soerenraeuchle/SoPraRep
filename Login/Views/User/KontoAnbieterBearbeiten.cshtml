@@ -1,0 +1,45 @@
+﻿@model Login.Models.Anbieter
+
+@{
+    ViewBag.Title = "KontoBearbeiten";
+}
+
+<h2>Mein Konto bearbeiten</h2>
+
+<div id="kontoEdit" class="konto">
+@using (Html.BeginForm())
+{
+    <div id="name" class="gruppe">
+        @Html.HiddenFor(model => model.passwort)
+        @Html.HiddenFor(model => model.confirmPasswort)
+        @Html.HiddenFor(model => model.email)
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.vorname)
+            @Html.EditorFor(model => model.vorname)
+            @Html.ValidationMessageFor(model => model.vorname)
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.nachname)
+            @Html.EditorFor(model => model.nachname)
+            @Html.ValidationMessageFor(model => model.nachname)
+        </div>
+    </div>
+
+    
+
+    <div id="uni" class="gruppe">
+        <h3>Identifikation</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.institut)
+            @Html.EditorFor(model => model.institut)
+            @Html.ValidationMessageFor(model => model.institut)
+        </div>
+
+        
+    </div>
+
+    <input type="submit" id="editKonto" value="speichern" />
+}
+</div>
