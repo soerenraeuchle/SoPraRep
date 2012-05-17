@@ -36,8 +36,9 @@ namespace Login.Controllers
         {
             if(ModelState.IsValid)
             {
-                int[] userData = getUserDaten();
-                stelle.anbieterID = userData[0];
+                string email = HttpContext.User.Identity.Name;
+                Anbieter benutzer = DB.anbieterAuslesen(email);
+                stelle.anbieterID = benutzer.id;
                 if(DB.stellenangebotHinzufügen(stelle))
                 {
                     return RedirectToAction("Index","User");
@@ -56,10 +57,13 @@ namespace Login.Controllers
         /// <returns></returns>
         public PartialViewResult _StellenAngebotSteuerung()
         {
-            int[] userData = getUserDaten();
+            string email = HttpContext.User.Identity.Name;
+            Anbieter benutzer = DB.anbieterAuslesen(email);
 
-            StellenangebotUebersicht angebote = new StellenangebotUebersicht(DB.stellenangebotUebersichtLesen(userData[0]));
+
+            StellenangebotUebersicht angebote = new StellenangebotUebersicht(DB.stellenangebotUebersichtLesen(benutzer.id));
             return PartialView(angebote);
+
         }
 
         /// <summary>
@@ -102,8 +106,9 @@ namespace Login.Controllers
         {
             if (ModelState.IsValid)
             {
-                int[] userData = getUserDaten();
-                stelle.anbieterID = userData[0];
+                string email = HttpContext.User.Identity.Name;
+                Anbieter benutzer = DB.anbieterAuslesen(email);
+                stelle.anbieterID = benutzer.id;
                 DB.stellenangebotAktualisieren(stelle);
 
                 return View("StellenAngebot", stelle);
@@ -125,31 +130,6 @@ namespace Login.Controllers
             return RedirectToAction("Index", "User");
         }
     
-        /// <summary>
-        /// Liest aus dem FormsAuthenticationTicket die User ID und die User Rolle
-        /// </summary>
-        /// <returns></returns>
-        public int[] getUserDaten()
-        {
-            FormsIdentity ident = User.Identity as FormsIdentity;
-            if (ident != null)
-            {
-                FormsAuthenticationTicket ticket = ident.Ticket;
-                string userDataString = ticket.UserData;
-
-                // string nach | teilen
-                String[] userDataPieces = userDataString.Split('|');
-                int[] userData = new int[2];
-                userData[0] = Convert.ToInt32(userDataPieces[0]);
-                userData[1] = Convert.ToInt32(userDataPieces[1]);
-
-                return userData;
-            }
-            else
-            {
-                return null;
-            }
-        }
 
 
     }
