@@ -17,12 +17,13 @@
 <div class="sidebar">
      @{if(!Request.IsAuthenticated)
       {
-        
           @Html.Partial("_Login")
       }
       else
       {
         @Html.Partial("_BenutzerSteuerung")
+        @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
+
       }
     }
     </div>

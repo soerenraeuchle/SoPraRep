@@ -171,7 +171,6 @@ namespace Login.Controllers
                             "WHERE email='" + user.email + "'";
 
             DB.aendern(query);
-
             return RedirectToAction("Konto");
         }
 
@@ -185,6 +184,8 @@ namespace Login.Controllers
         public ActionResult Login(Login.Models.Login user)
         {
             user.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(user.Passwort, "SHA1");
+
+            
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
@@ -213,18 +214,17 @@ namespace Login.Controllers
 
                         return RedirectToAction("index", "User");
                     }
-                    
-                    ModelState.AddModelError("", "Passwort falsch");
-                    
-
                 }
                 else
-                {
-                    ModelState.AddModelError("", "Emailadresse existiert nicht");
+                { // falsches passwort
+
                 }
 
             }
-           
+            else
+            {
+                ModelState.AddModelError("", "Falsche eingabe");
+            }
             return View("index");
         }
 
@@ -337,6 +337,32 @@ namespace Login.Controllers
                 return false;
             }
             return true;
+        }
+
+        /// <summary>
+        /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
+        /// </summary>
+        /// <returns>string[] userDaten</returns>
+        public int[] getUserDaten()
+        {
+            FormsIdentity ident = User.Identity as FormsIdentity;
+            if (ident != null)
+            {
+                FormsAuthenticationTicket ticket = ident.Ticket;
+                string userDataString = ticket.UserData;
+
+                // string nach | teilen
+                String[] userDataPieces = userDataString.Split('|');
+                int[] userData = new int[2];
+                userData[0] = Convert.ToInt32(userDataPieces[0]);
+                userData[1] = Convert.ToInt32(userDataPieces[1]);
+
+                return userData;
+            }
+            else
+            {
+                return null;
+            }
         }
 
         //TODO

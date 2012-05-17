@@ -14,8 +14,6 @@ namespace Login.Models
     public class Stellenangebot
     {
 
-<<<<<<< HEAD
-=======
         public Stellenangebot(int _id, string _stellenName, string _beschreibung, string _institut, int _anbieterID,
                               Date _startAnstellung, Date _endeAnstellung, Date _bewerbungsFrist, int _monatsStunden, int _anzahlOffeneStellen,
                               string _ort, string _vorraussetzungen)
@@ -37,19 +35,15 @@ namespace Login.Models
         public Stellenangebot()
         {
             // TODO: Complete member initialization
-            this.startAnstellung = new Date();
-            this.endeAnstellung = new Date();
-            this.bewerbungsFrist = new Date();
         }
 
->>>>>>> 2fb94d8... Alles Repariert, Stabiler Zustand (Stellenangebote)
         public int id { get; set; }
 
         //---------------Grunddaten Stellenangebot--------------------------------------
 
         [Required]
         [StringLength(50)]
-        public string stelllenName { get; set; }
+        public string stellenName { get; set; }
 
         [StringLength(50)]
         public string ort { get; set; }
@@ -74,9 +68,8 @@ namespace Login.Models
         [StringLength(50)]
         public string institut { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string anbieter { get; set; }
+        [Integer]
+        public int anbieterID { get; set; }
 
         //---------------Zeitangaben--------------------------------------
 

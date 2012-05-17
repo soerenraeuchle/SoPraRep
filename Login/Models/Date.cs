@@ -11,16 +11,16 @@ namespace Login.Models
     /// </summary>
     public class Date
     {
-        public int day {  get; private set; }
-        public int month { get; private set; }
-        public int year { get; private set; }
+        public int day {  get; set; }
+        public int month { get; set; }
+        public int year { get; set; }
 
-
-        public Date(int _day, int _month, int _year)
+        public Date(string date)
         {
-            this.day = _day;
-            this.month = _month;
-            this.year = _year;
+            string[] splitDate = date.Split('-');
+            this.day = Convert.ToInt32(splitDate[0]);
+            this.month = Convert.ToInt32(splitDate[1]);
+            this.year = Convert.ToInt32(splitDate[2]);
         }
 
         public Date(string date)
