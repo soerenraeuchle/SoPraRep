@@ -16,26 +16,14 @@ namespace Login.Controllers
     public class UserController : Controller
     {
         DBManager DB = DBManager.getInstanz();
-<<<<<<< HEAD
 
-=======
         
->>>>>>> origin/michi
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
         /// </summary>
         /// <returns>Index.cshtml</returns>
         public ActionResult Index()
         {
-            int[] data = getUserDaten();
-            if (data != null)
-            {
-                ViewData.Add("Rolle", data[1]);
-            }
-            else
-            {
-                ViewData.Add("Rolle", 12);
-            }
             return View();
         }
 
@@ -59,34 +47,22 @@ namespace Login.Controllers
         /// <returns>Index.cshtml</returns>
         public ActionResult RegisterBewerber(Bewerber model)
         {
-<<<<<<< HEAD
-            string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-            DB.aendern("INSERT INTO " +
-                            "Benutzer " +
-                                "( vorname, nachname, email, studiengang, fachsemester, strasse, hausnummer, wohnort, plz, passwort, rechte, freischaltung, matrikelnummer, institut, stellvertreterID) " +
-                            "VALUES " +
-                                "(" +
-                                    "'" + model.vorname + "', '" + model.nachname + "', '" + model.email + "', '" + model.studiengang + "', " + model.fachsemester + ", '" + model.strasse + "', '" + model.hausnummer + "', '" + model.wohnort + "', " +
-                                    model.plz + ", '" + passwort + "', 0, 1, " + model.matrikelnummer + ", '" + model.institut + "', 12)");
-
-=======
             if (ModelState.IsValid)
             {
                 if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
                 {
                     string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-                    if (model.rechte == 0)
+                    
+                    if (DB.bewerberSpeichern(model))
                     {
-                        if (DB.bewerberSpeichern(model))
-                        {
-                            FormsAuthentication.SetAuthCookie(model.email, false);
-                        }
+                        FormsAuthentication.SetAuthCookie(model.email, false);
                     }
+                    
                     
                 }
             }
            
->>>>>>> origin/michi
+
             return RedirectToAction("Index");
         }
 
@@ -161,27 +137,6 @@ namespace Login.Controllers
         [Authorize]
         public ActionResult Konto()
         {
-<<<<<<< HEAD
-            Benutzer user = new Benutzer();
-            user.email = HttpContext.User.Identity.Name;
-
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
-            SqlDataReader reader = DB.auslesen(query);
-            reader.Read();
-            user.vorname = reader.GetValue(0).ToString();
-            user.nachname = reader.GetValue(1).ToString();
-            user.strasse = reader.GetValue(2).ToString();
-            user.hausnummer = reader.GetValue(3).ToString();
-            user.plz = reader.GetInt32(4);
-            user.wohnort = reader.GetValue(5).ToString();
-            user.matrikelnummer = reader.GetInt32(6);
-            user.studiengang = reader.GetValue(7).ToString();
-            user.fachsemester = reader.GetValue(8).ToString();
-
-            reader.Close();
-
-            return View(user);
-=======
             string email = HttpContext.User.Identity.Name;
             //BewerberKonto
             if (Roles.GetRolesForUser(email)[0].Equals("Bewerber"))
@@ -202,7 +157,7 @@ namespace Login.Controllers
                 }
             }
             return View("Index");
->>>>>>> origin/michi
+
         }
 
 
@@ -236,31 +191,9 @@ namespace Login.Controllers
         [Authorize(Roles="Bewerber")]
         public ActionResult KontoBewerberBearbeiten()
         {
-<<<<<<< HEAD
-            Benutzer user = new Benutzer();
-            user.email = HttpContext.User.Identity.Name;
-
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester FROM Benutzer WHERE email='" + user.email + "'";
-            SqlDataReader reader = DB.auslesen(query);
-            reader.Read();
-            user.vorname = reader.GetValue(0).ToString();
-            user.nachname = reader.GetValue(1).ToString();
-            user.strasse = reader.GetValue(2).ToString();
-            user.hausnummer = reader.GetValue(3).ToString();
-            user.plz = reader.GetInt32(4);
-            user.wohnort = reader.GetValue(5).ToString();
-            user.matrikelnummer = reader.GetInt32(6);
-            user.studiengang = reader.GetValue(7).ToString();
-            user.fachsemester = reader.GetValue(8).ToString();
-
-            reader.Close();
-
-            return View(user);
-=======
             string email = HttpContext.User.Identity.Name;
             Bewerber benutzer = DB.bewerberAuslesen(email);
-            return View(benutzer);
-            
+            return View(benutzer); 
         }
         
         /// <summary>
@@ -292,50 +225,21 @@ namespace Login.Controllers
             string email = HttpContext.User.Identity.Name;
             Anbieter benutzer = DB.anbieterAuslesen(email);
             return View(benutzer);
-
->>>>>>> origin/michi
         }
-
-        /// <summary>
-        /// Übernimmt die vom Benutzer in die KontoBearbeiten Seite eingetragenen Änderungen
-        /// in die Datenbank und leitet den Benutzer auf die Konto Seite weiter
-        /// </summary>
-        /// <param name="user">Benutzer model</param>
-        /// <returns>Konto.cshtml</returns>
 
         [HttpPost]
         [Authorize(Roles = "Anbieter")]
         public ActionResult KontoAnbieterBearbeiten(Anbieter benutzer)
         {
-<<<<<<< HEAD
-            user.email = HttpContext.User.Identity.Name;
-
-            string query = "UPDATE Benutzer SET " +
-                                "vorname='" + user.vorname + "', " +
-                                "nachname='" + user.nachname + "', " +
-                                "strasse='" + user.strasse + "', " +
-                                "hausnummer='" + user.hausnummer + "', " +
-                                "plz='" + user.plz + "', " +
-                                "wohnort='" + user.wohnort + "', " +
-                                "matrikelnummer='" + user.matrikelnummer + "', " +
-                                "studiengang='" + user.studiengang + "', " +
-                                "fachsemester='" + user.fachsemester + "' " +
-                            "WHERE email='" + user.email + "'";
-
-            DB.aendern(query);
-            return RedirectToAction("Konto");
-=======
-
             if (ModelState.IsValid)
             {
                 DB.anbieterAktualisieren(benutzer);
                 return RedirectToAction("Konto");
             }
-
             return RedirectToAction("Fehler");
-
->>>>>>> origin/michi
         }
+
+      
 
         /// <summary>
         /// Gleicht die vom Benutzer in das Loginfeld eingegebenen Daten mit der 
@@ -351,26 +255,7 @@ namespace Login.Controllers
             
 
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
-            {
-<<<<<<< HEAD
-                string query = "SELECT id, passwort, rechte FROM Benutzer WHERE email='" + user.Email + "'";
-                SqlDataReader reader = DB.auslesen(query);
-                reader.Read();
-                string pw = reader.GetValue(1).ToString();
-
-                if (reader.HasRows)
-                {
-                    if (password == pw)
-                    {
-                        string userDataString = reader.GetValue(0).ToString() + "|" + reader.GetValue(2).ToString();
-                        FormsAuthentication.SetAuthCookie(user.Email, false);
-                        HttpCookie authCookie = FormsAuthentication.GetAuthCookie(user.Email, false);
-                        FormsAuthenticationTicket ticket = FormsAuthentication.Decrypt(authCookie.Value);
-                        FormsAuthenticationTicket newTicket = new FormsAuthenticationTicket(ticket.Version, ticket.Name, ticket.IssueDate, ticket.Expiration, ticket.IsPersistent, userDataString);
-                        authCookie.Value = FormsAuthentication.Encrypt(newTicket);
-                        Response.Cookies.Add(authCookie);
-                        //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
-=======
+            {            
                 Benutzer check = DB.benutzerAuslesen(login.Email);
 
                 //schauen ob Emailadresse vorhanden
@@ -395,18 +280,8 @@ namespace Login.Controllers
                             Anbieter benutzer = DB.anbieterAuslesen(check.email);
                             FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
                         }
->>>>>>> origin/michi
 
                         return RedirectToAction("index", "User");
-<<<<<<< HEAD
-                    }
-                }
-                else
-                { // falsches passwort
-
-                }
-                reader.Close();
-=======
 
                     }
                     else
@@ -417,11 +292,7 @@ namespace Login.Controllers
                 }
                 
 
->>>>>>> origin/michi
-            }
-            else
-            {
-                ModelState.AddModelError("", "Falsche eingabe");
+
             }
             return View("index");
         }
@@ -438,90 +309,5 @@ namespace Login.Controllers
             return RedirectToAction("Index", "User");
         }
 
-
-<<<<<<< HEAD
-        /// <summary>
-        /// Speichert den Benutzer in die Datenbank
-        /// </summary>
-        /// <param name="user">Register model</param>
-        /// <returns>Boolean erfolgreich</returns>
-        private bool benutzerSpeichern(Benutzer user)
-        {
-            string query = "INSERT INTO " +
-                                "Benutzer " +
-                                    "(" +
-                                        "vorname, " +
-                                        "nachname, " +
-                                        "email, " +
-                                        "studiengang, " +
-                                        "fachsemester, " +
-                                        "strasse, " +
-                                        "hausnummer, " +
-                                        "wohnort, " +
-                                        "plz, " +
-                                        "passwort, " +
-                                        "rechte, " +
-                                        "freischaltung, " +
-                                        "matrikelnummer, " +
-                                        "institut, " +
-                                        "stellvertreterID" +
-                                    ") " +
-                                "VALUES " +
-                                    "(" +
-                                        "'" + user.vorname + "', " +
-                                        "'" + user.nachname + "', " +
-                                        "'" + user.email + "', " +
-                                        "'" + user.studiengang + "', " +
-                                        user.fachsemester + ", " +
-                                        "'" + user.strasse + "', " +
-                                        "'" + user.hausnummer + "', " +
-                                        "'" + user.wohnort + "', " +
-                                        user.plz + ", " +
-                                        "'" + user.passwort + "', " +
-                                        user.rechte + ", " +
-                                        user.freischaltung + ", " +
-                                        user.matrikelnummer + ", " +
-                                        "'" + user.institut + "', " +
-                                        user.stellvertreterID +
-                                    ")";
-            
-            DB.aendern(query);
-            return true;
-        }
-
-        /// <summary>
-        /// liest die hinterlegten Benutzerdaten aus dem AuthCookie
-        /// </summary>
-        /// <returns>string[] userDaten</returns>
-        public int[] getUserDaten()
-        {
-            FormsIdentity ident = User.Identity as FormsIdentity;
-            if (ident != null)
-            {
-                FormsAuthenticationTicket ticket = ident.Ticket;
-                string userDataString = ticket.UserData;
-
-                // string nach | teilen
-                String[] userDataPieces = userDataString.Split('|');
-                int[] userData = new int[2];
-                userData[0] = Convert.ToInt32(userDataPieces[0]);
-                userData[1] = Convert.ToInt32(userDataPieces[1]);
-
-                return userData;
-            }
-            else
-            {
-                return null;
-            }
-        }
-
-        //TODO
-        private bool GetUserByEmail(string email)
-        {
-            return true;
-        }
-=======
-       
->>>>>>> origin/michi
     }
 }
