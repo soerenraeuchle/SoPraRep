@@ -100,45 +100,7 @@ a.ui-dialog-titlebar-close
     padding: 0 10px;
     text-decoration: none;
 }
-/*
- * Style for Stellenangebot
------------------------------------------------------------*/
-.content h2 
-{
-    background-color: #232323;
-    color: #EEEEEE;
-    padding: 20px;
-}
 
-#stellenangebotMain .input 
-{
-    font-size: 20px;
-}
-
-.stellenangebot .gruppe 
-{
-    padding: 20px;
-    border-bottom: 1px solid #232323;
-}
-
-.stellenangebot .input 
-{
-    position: relative;
-    display: inline-block;
-    height: 50px;
-    padding: 0 20px;
-    min-width: 200px;
-}
-
-.stellenangebot label 
-{
-    position: absolute;
-    top: 27px;
-    text-transform: uppercase;
-    font-size: 10px;
-    font-weight: bold;
-    color: #666;
-}
 
 /*
  * Style for Konto

@@ -16,14 +16,14 @@ namespace Login.Controllers
         DBManager DB = DBManager.getInstanz();
 
         [Authorize]
-        [HttpGet]
         public ActionResult NeuesStellenAngebot()
         {
             Stellenangebot stelle = new Stellenangebot();
-            ViewData.Add("Title", "Neues Stellenangebot erstellen");
-            ViewData.Add("Methode", "NeuesStellenAngebot");
+            ViewData.Add("Title", "Stellenangebot erstellen");
+            ViewData.Add("Methode", "NeueStelleSpeichern");
             return View("StellenangebotBearbeiten",stelle);
         }
+
 
         /// <summary>
         /// Die Methode "neueStelleSpeichern" speichert ein neu angelegtes Stellenangebot
@@ -59,9 +59,6 @@ namespace Login.Controllers
             string startAnstellung = stelle.startAnstellung.getDate();
             string endeAnstellung = stelle.endeAnstellung.getDate();
             string bewerbungsFrist = stelle.bewerbungsFrist.getDate();
-            int[] userData = getUserDaten();
-
-
             string query = "INSERT INTO " +
                                 "Stellenangebote " +
                                     "(" +
@@ -236,7 +233,7 @@ namespace Login.Controllers
                 int[] userData = new int[2];
                 userData[0] = Convert.ToInt32(userDataPieces[0]);
                 userData[1] = Convert.ToInt32(userDataPieces[1]);
-                
+
                 return userData;
             }
             else
