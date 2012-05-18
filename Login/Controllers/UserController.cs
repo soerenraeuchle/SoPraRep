@@ -16,6 +16,7 @@ namespace Login.Controllers
     public class UserController : Controller
     {
         DBManager DB = DBManager.getInstanz();
+
         
         /// <summary>
         /// Ruft die Hauptseite mit login Bereich auf
@@ -51,7 +52,7 @@ namespace Login.Controllers
                 if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
                 {
                     string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-
+                    
                     if (DB.bewerberSpeichern(model))
                     {
                         FormsAuthentication.SetAuthCookie(model.email, false);
@@ -60,8 +61,9 @@ namespace Login.Controllers
                     
                 }
             }
-           
-            return RedirectToAction("Index");
+
+
+            return RedirectToAction("index");
         }
 
 
@@ -155,6 +157,7 @@ namespace Login.Controllers
                 }
             }
             return View("Index");
+
         }
 
 
@@ -190,8 +193,7 @@ namespace Login.Controllers
         {
             string email = HttpContext.User.Identity.Name;
             Bewerber benutzer = DB.bewerberAuslesen(email);
-            return View(benutzer);
-            
+            return View(benutzer); 
         }
         
         /// <summary>
@@ -223,30 +225,21 @@ namespace Login.Controllers
             string email = HttpContext.User.Identity.Name;
             Anbieter benutzer = DB.anbieterAuslesen(email);
             return View(benutzer);
-
         }
-
-        /// <summary>
-        /// Übernimmt die vom Benutzer in die KontoBearbeiten Seite eingetragenen Änderungen
-        /// in die Datenbank und leitet den Benutzer auf die Konto Seite weiter
-        /// </summary>
-        /// <param name="user">Benutzer model</param>
-        /// <returns>Konto.cshtml</returns>
 
         [HttpPost]
         [Authorize(Roles = "Anbieter")]
         public ActionResult KontoAnbieterBearbeiten(Anbieter benutzer)
         {
-
             if (ModelState.IsValid)
             {
                 DB.anbieterAktualisieren(benutzer);
                 return RedirectToAction("Konto");
             }
-
             return RedirectToAction("Fehler");
-
         }
+
+      
 
         /// <summary>
         /// Gleicht die vom Benutzer in das Loginfeld eingegebenen Daten mit der 
@@ -257,10 +250,9 @@ namespace Login.Controllers
         [HttpPost]
         public ActionResult Login(Login.Models.Login login)
         {
-            login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
-
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
             {
+                login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
                 Benutzer check = DB.benutzerAuslesen(login.Email);
 
                 //schauen ob Emailadresse vorhanden
@@ -285,9 +277,7 @@ namespace Login.Controllers
                             Anbieter benutzer = DB.anbieterAuslesen(check.email);
                             FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
                         }
-
-                        return RedirectToAction("index", "User");
-
+                        return RedirectToAction("index", "user");
                     }
                     else
                     {
@@ -295,12 +285,12 @@ namespace Login.Controllers
                         ModelState.AddModelError("", "Passwort falsch");
                     }
                 }
-                
-
             }
-           
+
             return View("index");
         }
+
+
 
 
         /// <summary>
@@ -314,7 +304,5 @@ namespace Login.Controllers
             return RedirectToAction("Index", "User");
         }
 
-
-       
     }
 }

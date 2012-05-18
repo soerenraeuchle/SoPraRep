@@ -1,0 +1,33 @@
+@model Login.Models.StellenangebotUebersicht
+
+@{
+    ViewBag.Title = "Stellenangebote";
+}
+
+@{
+    if(this.Model.angebote.Count != 0)
+    {
+        <h3>Derzeit sind @this.Model.angebote.Count Angebote verfügbar</h3>
+  
+        for (int i = 0; i < Model.angebote.Count; i++ )
+        {
+            <div>@Model.angebote.ElementAt(i).stellenName ||  
+            @Model.angebote.ElementAt(i).institut ||  
+            @Model.angebote.ElementAt(i).ort ||  
+            @Model.angebote.ElementAt(i).vorraussetzungen || 
+            @Model.angebote.ElementAt(i).anzahlOffeneStellen
+            @using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", new {view = "anzeigen"}))
+            {
+                @Html.HiddenFor(model => model.angebote.ElementAt(i).id)
+                <input type="submit"  value="ansehen" />
+            }
+            </div>                                                                                             
+            <hr />
+        }
+    }
+    else
+    {
+         <div>Sie haben keine angebote ausgeschrieben</div>   
+    }
+}
+   

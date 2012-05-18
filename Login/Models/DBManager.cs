@@ -21,11 +21,9 @@ namespace Login.Models
         private DBManager() { }
         private static DBManager instance = null;
 
-        //private static string ConnectionString = "Data Source=.\\SQLEXPRESS;AttachDbFilename=C:\\dev\\asp\\sopra\\Login\\Login\\App_Data\\Sopra.mdf;Integrated Security=True;User Instance=True";
         private static string ConnectionString = "Data Source=.\\SQLEXPRESS;AttachDbFilename=|DataDirectory|Sopra.mdf;Integrated Security=True;User Instance=True";
         private SqlConnection con = new SqlConnection(ConnectionString);
 
-        private string lastSqlQuery;
         private string lastError;
 
         /// <summary>
@@ -83,7 +81,7 @@ namespace Login.Models
             }
         }
 
-        
+      
         //------------------------------------------------------------------------------------------------------------------------
         //-------------------------------------------Benutzer Datenbank Methoden--------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------
@@ -91,7 +89,7 @@ namespace Login.Models
         public Benutzer benutzerAuslesen(String email)
         {
             Benutzer benutzer = new Benutzer();
-            string query = "SELECT vorname, nachname, rechte, passwort FROM Benutzer WHERE email=@email";
+            string query = "SELECT vorname, nachname, rechte, passwort, id FROM Benutzer WHERE email=@email";
 
             try
             {
@@ -113,7 +111,7 @@ namespace Login.Models
                     benutzer.rechte = reader.GetInt32(2);
                     benutzer.passwort = reader.GetString(3);
                     benutzer.confirmPasswort = benutzer.passwort;
-
+                    benutzer.id = reader.GetInt32(4);
                     benutzer.email = email;
 
                     reader.Close();
@@ -186,11 +184,13 @@ namespace Login.Models
                 if (reader.HasRows)
                 {
                     disconnect();
+                    reader.Close();
                     return true;
                 }
                 else
                 {
                     disconnect();
+                    reader.Close();
                     return false;
                 }
             }
@@ -198,6 +198,7 @@ namespace Login.Models
             {
                 lastError = e.StackTrace;
                 Console.WriteLine(e.StackTrace);
+                
                 return false;
             }
         }
@@ -294,7 +295,7 @@ namespace Login.Models
         public Bewerber bewerberAuslesen(String email)
         {
             Bewerber benutzer = new Bewerber();
-            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester, passwort FROM Benutzer WHERE email=@email";
+            string query = "SELECT vorname, nachname, strasse, hausnummer, plz, wohnort, matrikelnummer, studiengang, fachsemester, passwort, id FROM Benutzer WHERE email=@email";
 
             try
             {
@@ -316,11 +317,14 @@ namespace Login.Models
                 benutzer.matrikelnummer = reader.GetInt32(6);
                 benutzer.studiengang = reader.GetString(7);
                 benutzer.fachsemester = reader.GetInt32(8);
+                
 
                 benutzer.email = email;
 
                 benutzer.passwort = reader.GetString(9);
                 benutzer.confirmPasswort = benutzer.passwort;
+
+                benutzer.id = reader.GetInt32(10);
 
                 reader.Close();
                 disconnect();
@@ -446,7 +450,7 @@ namespace Login.Models
         public Anbieter anbieterAuslesen(String email)
         {
             Anbieter benutzer = new Anbieter();
-            string query = "SELECT vorname, nachname, institut, passwort FROM Benutzer WHERE email=@email";
+            string query = "SELECT vorname, nachname, institut, passwort, id FROM Benutzer WHERE email=@email";
 
             try
             {
@@ -456,19 +460,22 @@ namespace Login.Models
 
                 connect();
                 SqlDataReader reader = cmd.ExecuteReader();
-                reader.Read();
+                    reader.Read();
 
-                //Anbieter auslesen
-                benutzer.vorname = reader.GetString(0);
-                benutzer.nachname = reader.GetString(1);
-                benutzer.institut = reader.GetString(2);
+                    //Anbieter auslesen
+                    benutzer.vorname = reader.GetString(0);
+                    benutzer.nachname = reader.GetString(1);
+                    benutzer.institut = reader.GetString(2);
 
-                benutzer.passwort = reader.GetString(3);
-                benutzer.confirmPasswort = benutzer.passwort;
+                    benutzer.passwort = reader.GetString(3);
+                    benutzer.confirmPasswort = benutzer.passwort;
 
-                benutzer.email = email;
+                    benutzer.id = reader.GetInt32(4);
 
-                reader.Close();
+                    benutzer.email = email;
+
+                    reader.Close();
+                
                 disconnect();
                 return benutzer;
             }
@@ -514,73 +521,288 @@ namespace Login.Models
         }
 
 
-        /// <summary>
-        /// Führt einen SQL Befehl aus, der schreibend auf die Datenbank zugreift.
-        /// </summary>
-        /// <param name="query">
-        /// SQL Befehl
-        /// </param>
-        /// <returns>
-        /// Gibt die Anzahl der betroffenen Zeilen zurück.
-        /// </returns>
-        public int aendern(string query)
+
+        //--------------------------------------------------------------------------------------------------------------------
+        //-------------------------------------STELLENANGEBOTE PREPARED STATEMENTS--------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
+        public bool stellenangebotAktualisieren(Models.Stellenangebot stelle)
         {
+
+            string query = "UPDATE Stellenangebote SET " +
+                                    "stellenName= @stellenName, " +
+                                    "beschreibung = @beschreibung, " +
+                                    "institut = @institut, " +
+                                    "anbieterID = @anbieterID, " +
+                                    "startAnstellung = @startanstellung, " +
+                                    "endeAnstellung = @endeAnstellung, " +
+                                    "bewerbungsfrist = @bewerbungsfrist, " +
+                                    "monatsStunden = @monatsStunden, " +
+                                    "anzahlOffeneStellen = @anzahlOffeneStellen, " +
+                                    "ort = @ort, " +
+                                    "vorraussetzungen = @vorraussetzungen " +
+                                    "WHERE id = @id";
+           
             try
             {
-                lastSqlQuery = query;
-                if (!connect()) return -1;
                 SqlCommand cmd = new SqlCommand(query, con);
-                int affectedRows = cmd.ExecuteNonQuery();
-                if (!disconnect()) return -1;
-                return affectedRows;
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@stellenName", stelle.stellenName);
+                cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
+                cmd.Parameters.AddWithValue("@institut", stelle.institut);
+                cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
+                cmd.Parameters.AddWithValue("@startanstellung", stelle.startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", stelle.endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", stelle.bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
+                cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
+                cmd.Parameters.AddWithValue("@ort", stelle.ort);
+                cmd.Parameters.AddWithValue("@vorraussetzungen", stelle.vorraussetzungen);
+                cmd.Parameters.AddWithValue("@id", stelle.id);
+
+           
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+
             }
             catch (SqlException e)
             {
-                lastError = e.StackTrace;
                 Console.WriteLine(e.StackTrace);
-                return -1;
+                return false;
             }
         }
 
+        public bool stellenangebotHinzufügen(Stellenangebot stelle)
+        {
+            string query = "INSERT INTO Stellenangebote" +
+                                    "(" +
+                                        "stellenName, " +
+                                        "beschreibung, " +
+                                        "institut, " +
+                                        "anbieterID, " +
+                                        "startAnstellung, " +
+                                        "endeAnstellung, " +
+                                        "bewerbungsFrist, " +
+                                        "monatsStunden, " +
+                                        "anzahlOffeneStellen, " +
+                                        "ort, " +
+                                        "vorraussetzungen " + ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "@stellenName, " +
+                                        "@beschreibung, " +
+                                        "@institut, " +
+                                        "@anbieterID, " +
+                                        "@startAnstellung, " +
+                                        "@endeAnstellung, " +
+                                        "@bewerbungsFrist, " +
+                                        "@monatsStunden, " +
+                                        "@anzahlOffeneStellen, " +
+                                        "@ort, " +
+                                        "@vorraussetzungen " + ") ";
 
-        //public int aendernPrepared(string query, Object[] values)
-        //{
-        //    try
-        //    {
-        //        lastSqlQuery = query;
-        //        if (!connect()) return -1;
-        //        SqlCommand cmd = new SqlCommand(query, con);
-        //        cmd.Prepare();
-        //        for (int i = 0; i < values.Count(); i++)
-        //        {
-        //            Type typ = values[i].GetType();
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@stellenName", stelle.stellenName);
+                cmd.Parameters.AddWithValue("@beschreibung", stelle.beschreibung);
+                cmd.Parameters.AddWithValue("@institut", stelle.institut);
+                cmd.Parameters.AddWithValue("@anbieterID", stelle.anbieterID);
+                cmd.Parameters.AddWithValue("@startanstellung", stelle.startAnstellung);
+                cmd.Parameters.AddWithValue("@endeAnstellung", stelle.endeAnstellung);
+                cmd.Parameters.AddWithValue("@bewerbungsfrist", stelle.bewerbungsFrist);
+                cmd.Parameters.AddWithValue("@monatsStunden", stelle.monatsStunden);
+                cmd.Parameters.AddWithValue("@anzahlOffeneStellen", stelle.anzahlOffeneStellen);
+                cmd.Parameters.AddWithValue("@ort", stelle.ort);
+                cmd.Parameters.AddWithValue("@vorraussetzungen", stelle.vorraussetzungen);
 
-        //            //If TypeOf a Is CBackware Then
 
-        //            if (typ.IsInstanceOfType(string)) {
 
-        //            }
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
 
-        //            if (typ.IsInstanceOfType(int)) {
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
 
-        //            }
-        //            if (typ.IsInstanceOfType(bool)) {
+        public bool stellenangebotLoeschen(Stellenangebot stelle){
+            string query = "DELETE FROM Stellenangebote " +
+                            "WHERE id = @id";
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", stelle.id);
 
-        //            }
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
 
-        //            cmd.Parameters.Add(values[i]);
-        //        }
+        public Stellenangebot stellenangebotLesen(int stellenID)
+        {
+            Stellenangebot stelle = new Stellenangebot();
 
-        //        int affectedRows = cmd.ExecuteNonQuery();
-        //        if (!disconnect()) return -1;
-        //        return affectedRows;
-        //    }
-        //    catch (SqlException e)
-        //    {
-        //        lastError = e.StackTrace;
-        //        Console.WriteLine(e.StackTrace);
-        //        return -1;
-        //    }
-        //}
+            string query = "SELECT stellenName, " +
+                "beschreibung, institut, anbieterID, " +
+                "startAnstellung, endeAnstellung, " +
+                "bewerbungsFrist, monatsStunden, " +
+            "anzahlOffeneStellen, ort, vorraussetzungen " +
+            "FROM Stellenangebote WHERE id= @id";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@id", stellenID);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    reader.Read();
+                    stelle.stellenName = reader.GetString(0).ToString();
+                    stelle.beschreibung = reader.GetString(1).ToString();
+                    stelle.institut = reader.GetString(2);
+                    stelle.anbieterID = reader.GetInt32(3);
+                    stelle.startAnstellung = reader.GetDateTime(4);
+                    stelle.endeAnstellung = reader.GetDateTime(5);
+                    stelle.bewerbungsFrist = reader.GetDateTime(6);
+                    stelle.monatsStunden = reader.GetInt32(7);
+                    stelle.anzahlOffeneStellen = reader.GetInt32(8);
+                    stelle.ort = reader.GetString(9);
+                    stelle.vorraussetzungen = reader.GetString(10);
+                    stelle.id = stellenID;
+
+
+                }
+
+                reader.Close();
+                disconnect();
+                return stelle;
+            }
+            catch (SqlException e)
+            {
+                return null;
+            }
+        }
+
+        public LinkedList<Stellenangebot> stellenangebotUebersichtLesen(int anbieterID)
+        {
+            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
+
+            string query = "SELECT stellenName, " +
+                "beschreibung, institut, anbieterID, " +
+                "startAnstellung, endeAnstellung, " +
+                "bewerbungsFrist, monatsStunden, " +
+            "anzahlOffeneStellen, ort, vorraussetzungen, id " +
+            "FROM Stellenangebote WHERE anbieterID= @anbieterID";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@anbieterID", anbieterID);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        Stellenangebot stelle = new Stellenangebot();
+                        stelle.stellenName = reader.GetString(0);
+                        stelle.beschreibung = reader.GetString(1);
+                        stelle.institut = reader.GetString(2);
+                        stelle.anbieterID = anbieterID;
+                        stelle.startAnstellung =reader.GetDateTime(4);
+                        stelle.endeAnstellung = reader.GetDateTime(5);
+                        stelle.bewerbungsFrist = reader.GetDateTime(6);
+                        stelle.monatsStunden = reader.GetInt32(7);
+                        stelle.anzahlOffeneStellen = reader.GetInt32(8);
+                        stelle.ort = reader.GetValue(9).ToString();
+                        stelle.vorraussetzungen = reader.GetString(10);
+                        stelle.id = reader.GetInt32(11);
+
+                        liste.AddLast(stelle);
+                    }
+
+                }
+
+                reader.Close();
+                disconnect();
+                return liste;
+            }
+            catch (SqlException e)
+            {
+                return null;
+            }
+        }
+
+        public LinkedList<Stellenangebot> stellenangeboteUebersichtLesen()
+        {
+            LinkedList<Stellenangebot> liste = new LinkedList<Stellenangebot>();
+
+            string query = "SELECT stellenName, " +
+                "beschreibung, institut, anbieterID, " +
+                "startAnstellung, endeAnstellung, " +
+                "bewerbungsFrist, monatsStunden, " +
+            "anzahlOffeneStellen, ort, vorraussetzungen, id " +
+            "FROM Stellenangebote ";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        Stellenangebot stelle = new Stellenangebot();
+                        stelle.stellenName = reader.GetString(0);
+                        stelle.beschreibung = reader.GetString(1);
+                        stelle.institut = reader.GetString(2);
+                        stelle.anbieterID = reader.GetInt32(3);
+                        stelle.startAnstellung = reader.GetDateTime(4);
+                        stelle.endeAnstellung = reader.GetDateTime(5);
+                        stelle.bewerbungsFrist = reader.GetDateTime(6);
+                        stelle.monatsStunden = reader.GetInt32(7);
+                        stelle.anzahlOffeneStellen = reader.GetInt32(8);
+                        stelle.ort = reader.GetValue(9).ToString();
+                        stelle.vorraussetzungen = reader.GetString(10);
+                        stelle.id = reader.GetInt32(11);
+
+                        liste.AddLast(stelle);
+                    }
+
+                }
+
+                reader.Close();
+                disconnect();
+                return liste;
+            }
+            catch (SqlException e)
+            {
+                return null;
+            }
+        }
     }
 }

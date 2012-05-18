@@ -1,0 +1,104 @@
+@model Login.Models.Stellenangebot
+
+@{
+    ViewBag.Title = "Stellenangebot";
+}
+
+<h2>Stellenangebot</h2>
+
+<div id="kontoMain" class="konto">
+    <div id="name" class="gruppe">
+        @Html.HiddenFor(model => model.id)
+        <h3>Name</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.stellenName)
+            <div id="stellenName">@Model.stellenName</div>
+            
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.ort)
+            <div id="ort">@Model.ort</div>
+
+        </div>
+    </div>
+
+    <div id="adresse" class="gruppe">
+        <h3>Daten</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.beschreibung)
+            <div id="beschreibung">@Model.beschreibung</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.vorraussetzungen)
+            <div id="vorraussetzungen">@Model.vorraussetzungen</div>
+        </div>
+
+        <br />
+
+        <div class="input">
+            @Html.LabelFor(model => model.monatsStunden)
+            <div id="monatsStunden">@Model.monatsStunden</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.anzahlOffeneStellen)
+            <div id="anzahlOffeneStellen">@Model.anzahlOffeneStellen</div>
+        </div>
+
+                
+    </div>
+
+    <div id="uni" class="gruppe">
+        <h3>Zeitangaben</h3>
+        <div class="input">
+            @Html.LabelFor(model => model.institut)
+            <div id="institut">@Model.institut</div>
+        </div>
+                
+        <div class="input">
+            @Html.LabelFor(model => model.anbieterID)
+            <div id="anbieterID">@Model.anbieterID</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.startAnstellung)
+            <div id="startAnstellung">@Model.startAnstellung.ToShortDateString()</div>
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.endeAnstellung)
+            <div id="endeAnstellung">@Model.endeAnstellung.ToShortDateString()</div>
+            
+        </div>
+
+        <div class="input">
+            @Html.LabelFor(model => model.bewerbungsFrist)
+            <div id="bewerbungsFrist">@Model.bewerbungsFrist.ToShortDateString()</div>
+        </div>
+    </div>
+
+    @{if (Roles.IsUserInRole("Anbieter"))
+      {
+            using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", FormMethod.Post, new { view = "bearbeiten" }))
+            {
+                @Html.HiddenFor(model => model.id)
+                <input type="submit" value="Bearbeiten" />
+            }
+            using (Html.BeginForm("StelleLöschen", "AngeboteManager", FormMethod.Post))
+            {
+                @Html.HiddenFor(model => model.id)
+                <input type="submit" value="Löschen" />
+            }
+      }
+      else
+      {
+
+      }
+    }
+    
+    
+
+
+</div>

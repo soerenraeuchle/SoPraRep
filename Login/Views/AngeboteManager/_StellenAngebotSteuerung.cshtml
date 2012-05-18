@@ -1,0 +1,37 @@
+@model Login.Models.StellenangebotUebersicht
+           
+@{ 
+    Layout = "";
+} 
+
+<div class="login">
+<h2>Meine Stellenangebote</h2>
+
+@{
+    if(Model.angebote.Count != 0)
+    {
+        for (int i = 0; i < Model.angebote.Count; i++ )
+        {
+            <div>@Model.angebote.ElementAt(i).stellenName
+            @using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", new {view = "anzeigen"}))
+            {
+                @Html.HiddenFor(model => model.angebote.ElementAt(i).id)
+                <input type="submit"  value="ansehen" />
+            }
+            </div>                                                                                             
+ 
+        }
+    }
+    else
+    {
+         <div>Sie haben keine angebote ausgeschrieben</div>   
+    }
+}
+   
+@using (Html.BeginForm("NeuesStellenAngebot", "AngeboteManager", FormMethod.Get))
+{
+    <input type="submit" value="neues Stellenangebot" />
+}
+
+
+</div>

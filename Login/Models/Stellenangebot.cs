@@ -11,11 +11,14 @@ namespace Login.Models
     /// <summary>
     /// Die Klasse Stellenangebote repräsentiert die Tabelle "Stellenangebote" in der Datenbank
     /// </summary>
+    /// 
+    [StartVorEnde(ErrorMessage = "Begin der Anstellung muss vor dem Ende sein")]
+    [BewerbungsFristVorStart(ErrorMessage = "Die Bewerbungsfrist muss vor dem Begin der Anstellung enden")]
     public class Stellenangebot
     {
 
         public Stellenangebot(int _id, string _stellenName, string _beschreibung, string _institut, int _anbieterID,
-                              Date _startAnstellung, Date _endeAnstellung, Date _bewerbungsFrist, int _monatsStunden, int _anzahlOffeneStellen,
+                              DateTime _startAnstellung, DateTime _endeAnstellung, DateTime _bewerbungsFrist, int _monatsStunden, int _anzahlOffeneStellen,
                               string _ort, string _vorraussetzungen)
         {
             this.id = _id;
@@ -26,7 +29,7 @@ namespace Login.Models
             this.monatsStunden = _monatsStunden;
             this.anzahlOffeneStellen = _anzahlOffeneStellen;
             this.institut = _institut;
-            //this.anbieterID = _anbieterID;
+            this.anbieterID = _anbieterID;
             this.startAnstellung = _startAnstellung;
             this.endeAnstellung = _endeAnstellung;
             this.bewerbungsFrist = _bewerbungsFrist;
@@ -35,11 +38,10 @@ namespace Login.Models
         public Stellenangebot()
         {
             // TODO: Complete member initialization
-            this.startAnstellung = new Date();
-            this.endeAnstellung = new Date();
-            this.bewerbungsFrist = new Date();
+            this.startAnstellung = DateTime.Today;
+            this.endeAnstellung = DateTime.Today;
+            this.bewerbungsFrist = DateTime.Today;
         }
-
 
         public int id { get; set; }
 
@@ -72,24 +74,47 @@ namespace Login.Models
         [StringLength(50)]
         public string institut { get; set; }
 
-        [Required]
-        [StringLength(50)]
-        public string anbieter { get; set; }
+        [Integer]
+        public int anbieterID { get; set; }
 
         //---------------Zeitangaben--------------------------------------
 
         [Required]
-        public  Date startAnstellung { get; set; }
-
-        [Required]
-        public Date endeAnstellung { get; set; }
-
-        [Required]
-        public Date bewerbungsFrist { get; set; }
-
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public  DateTime startAnstellung { get; set; }
         
 
-        
+        [Required]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime endeAnstellung { get; set; }
+
+        [Required]
+        [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
+        public DateTime bewerbungsFrist { get; set; }
+
+
+
+        [AttributeUsage(AttributeTargets.Class)]
+        public class StartVorEnde : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                var model = (Stellenangebot)value;
+                return model.startAnstellung < model.endeAnstellung;
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class)]
+        public class BewerbungsFristVorStart : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                var model = (Stellenangebot)value;
+                return model.bewerbungsFrist < model.startAnstellung;
+            }
+        }
+
+
 
         
 

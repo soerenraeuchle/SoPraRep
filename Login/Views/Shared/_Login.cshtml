@@ -32,7 +32,7 @@
         });
 
     </script>
-    @using (Html.BeginForm("Login", "User", FormMethod.Post))
+    @using (Html.BeginForm("Login", "User"))
     {
         <p>E-Mail:
         @Html.EditorFor(Model => Model.Email)
