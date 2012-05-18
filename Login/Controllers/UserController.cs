@@ -51,13 +51,12 @@ namespace Login.Controllers
                 if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
                 {
                     string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
-                    if (model.rechte == 0)
+
+                    if (DB.bewerberSpeichern(model))
                     {
-                        if (DB.bewerberSpeichern(model))
-                        {
-                            FormsAuthentication.SetAuthCookie(model.email, false);
-                        }
+                        FormsAuthentication.SetAuthCookie(model.email, false);
                     }
+                    
                     
                 }
             }

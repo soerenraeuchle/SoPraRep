@@ -83,63 +83,7 @@ namespace Login.Models
             }
         }
 
-        /// <summary>
-        /// Führt einen SQL Befehl aus, der Zeilen zurückgibt.
-        /// </summary>
-        /// <param name="query">
-        /// SQL Befehl
-        /// </param>
-        /// <returns>
-        /// Gibt ein SqlDataReader Objekt zurück, das die Daten des Querys enthält. Im Fehlerfall wird null zurückgegeben.
-        /// </returns>
-        public ArrayList auslesen(string query)
-        {
-            
-            try
-            {
-                lastSqlQuery = query;
-                ArrayList daten = new ArrayList();
-                if (!connect()) return null;
-                SqlCommand cmd = new SqlCommand(query, con);
-                SqlDataReader reader = cmd.ExecuteReader();
-                if (reader.HasRows)
-                {
-                    while(reader.Read()) 
-                    {
-                        int columns = reader.FieldCount;
-
-                        ArrayList data = new ArrayList();
-
-                        for (int i = 0; i < columns; i++)
-                        {
-                            var tmp = reader.GetValue(i);
-                            data.Add(tmp);
-                        }
-
-                        daten.Add(data);
-
-                    }
-                }
-                reader.Close();
-
-                if (!disconnect()) return null;
-                return daten;
-            }
-            catch (SqlException e)
-            {
-                lastError = e.StackTrace;
-                Console.WriteLine(e.StackTrace);
-                return null;
-            }
-            catch (InvalidOperationException e)
-            {
-                lastError = e.StackTrace;
-                Console.WriteLine(e.StackTrace);
-                return null;
-            }
-
-            
-        }
+        
         //------------------------------------------------------------------------------------------------------------------------
         //-------------------------------------------Benutzer Datenbank Methoden--------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------
