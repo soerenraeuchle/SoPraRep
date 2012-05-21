@@ -1,6 +1,10 @@
 ﻿@{
-    ViewBag.Title = "Index";
+    ViewBag.Title = "Hiwi Börse Ulm - Stellenangebote";
 }
 
-<h2>Index</h2>
-@ViewData["Rolle"]
+<h2>Hiwi Börse - Universität Ulm - Stellenangebote</h2>
+
+@Html.Action("_Filter", "AngeboteManager")
+<div id="StellenangeboteÜbersicht">
+@Html.Action("_StellenAngeboteÜbersicht", "AngeboteManager")
+</div>

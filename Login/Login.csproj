@@ -79,8 +79,8 @@
     </Compile>
     <Compile Include="Models\Benutzer.cs" />
     <Compile Include="Models\Bewerbung.cs" />
-    <Compile Include="Models\Date.cs" />
     <Compile Include="Models\DBManager.cs" />
+    <Compile Include="Models\Filter.cs" />
     <Compile Include="Models\Security\HiwiBoerseRoleProvider.cs" />
     <Compile Include="Models\Stellenangebot.cs" />
     <Compile Include="Models\StellenangebotUebersicht.cs" />
@@ -107,6 +107,7 @@
     <Content Include="Content\smoothness\images\ui-icons_888888_256x240.png" />
     <Content Include="Content\smoothness\images\ui-icons_cd0a0a_256x240.png" />
     <Content Include="Content\smoothness\jquery-ui-1.8.20.custom.css" />
+    <Content Include="Content\stellenangebotÜbersicht_webgrid.css" />
     <Content Include="Content\themes\base\images\ui-bg_flat_0_aaaaaa_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_flat_75_ffffff_40x100.png" />
     <Content Include="Content\themes\base\images\ui-bg_glass_55_fbf9ee_1x400.png" />
@@ -188,9 +189,6 @@
     <Content Include="Views\User\Konto.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\User\Index.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\User\Register.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -212,9 +210,6 @@
     <Content Include="Views\User\KontoAnbieterBearbeiten.cshtml" />
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Views\User\KontoEdit.cshtml" />
-  </ItemGroup>
-  <ItemGroup>
     <Content Include="Views\AngeboteManager\StellenAngebot.cshtml" />
   </ItemGroup>
   <ItemGroup>
@@ -224,6 +219,9 @@
     <None Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml">
       <SubType>Code</SubType>
     </None>
+    <Content Include="Views\User\Index.cshtml" />
+    <Content Include="Views\Shared\_Stellenangebote.cshtml" />
+    <Content Include="Views\Shared\_Filter.cshtml" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -1,0 +1,97 @@
+﻿@model Login.Models.StellenangebotUebersicht
+
+@{
+    ViewBag.Title = "Stellenangebote";
+    ViewBag.returnUrl = "~/";
+}
+
+
+@{
+     <h3></h3>
+        
+    
+    
+    WebGrid grid = new WebGrid((IEnumerable<Login.Models.Stellenangebot>)Model.angebote,
+        //selectionFieldName: "SelectedRow",
+        ajaxUpdateContainerId: "grid",
+        //defaultSort: "institut",
+        //canPage: false,
+        //canSort: true);
+        defaultSort: "stellenName",
+         rowsPerPage: 5,
+         canPage: true,
+         canSort: true,
+         fieldNamePrefix: "grid_",
+         pageFieldName: "inside",
+         selectionFieldName: "selectedRow");
+}   
+        
+
+    <div id="grid">
+    @grid.GetHtml(
+        tableStyle: "webgrid",
+        headerStyle: "webgrid-header",
+        footerStyle: "webgrid-footer",
+        alternatingRowStyle: "webgrid-alternating-row",
+        selectedRowStyle: "webgrid-selected-row",
+        rowStyle: "webgrid-row-style",
+
+       
+        
+    columns: grid.Columns(
+       
+        grid.Column(
+            columnName: "id",
+            style: "idColumn"),
+                     
+        grid.Column(
+             columnName: "stellenName",
+             header: "Name",
+             style: "uebersichtColumn"),
+
+        grid.Column(
+             columnName: "institut",
+             header: "Institut",
+             style: "uebersichtColumn"),
+
+        grid.Column(
+              columnName: "monatsStunden",
+              header: "Monats Stunden",
+              style: "uebersichtColumn"),
+        grid.Column(
+             columnName: "anzahlOffeneStellen",
+             header: "Offene Stellen",
+             style: "uebersichtColumn")
+       ))     
+
+        <form id="FormStelleAnsehen" action="/AngeboteManager/GetStelleAngebot?view=anzeigen" method="post">           
+        <input type="hidden" name="id" />
+
+        </form>
+
+
+</div>
+    
+
+
+<script type="text/javascript">
+    var headerCells = $("#grid tr:eq(0) th");
+    var firstRowCells = $("#grid tr:eq(1) td");
+    $(headerCells[0]).addClass($(firstRowCells[0]).attr("class"));
+
+    $(function () {
+        $('tbody tr').live('hover', function () {
+            $(this).toggleClass('clickable');
+        }).live('click', function () {
+
+            var temp = $(this).find('td:first').text();
+
+            document.forms["FormStelleAnsehen"].id.value = temp;
+            document.forms["FormStelleAnsehen"].submit();
+
+        });
+    });
+</script>    
+
+   
+

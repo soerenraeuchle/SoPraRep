@@ -1,0 +1,14 @@
+﻿@model Login.Models.Filter
+
+@{
+    Layout = "";
+}
+
+@using (Ajax.BeginForm("_StellenAngeboteÜbersicht", "AngeboteManager", new AjaxOptions(){ UpdateTargetId = "StellenangeboteÜbersicht", HttpMethod = "Post"}))
+{
+    @Html.DropDownListFor(model => model.institut, (IEnumerable<SelectListItem>)ViewData["Institute"])
+    @Html.DropDownListFor(model => model.monatsStunden, (IEnumerable<SelectListItem>)ViewData["MonatsStunden"])
+    @Html.TextBoxFor(model => model.Name)
+
+      <input type="submit" value="Filtern" />
+}

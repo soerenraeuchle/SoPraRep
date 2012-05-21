@@ -15,7 +15,7 @@
             <div>@Model.angebote.ElementAt(i).stellenName
             @using (Html.BeginForm("GetStelleAngebot", "AngeboteManager", new {view = "anzeigen"}))
             {
-                @Html.HiddenFor(model => model.angebote.ElementAt(i).id)
+                <input type="hidden" name="id" value="@Model.angebote.ElementAt(i).id"/>
                 <input type="submit"  value="ansehen" />
             }
             </div>                                                                                             

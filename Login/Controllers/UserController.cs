@@ -61,9 +61,9 @@ namespace Login.Controllers
                     
                 }
             }
-           
 
-            return RedirectToAction("Index");
+
+            return RedirectToAction("index");
         }
 
 
@@ -248,14 +248,12 @@ namespace Login.Controllers
         /// <param name="user">Login model</param>
         /// <returns>Index.cshtml</returns>
         [HttpPost]
+        [AcceptVerbs(HttpVerbs.Post)]
         public ActionResult Login(Login.Models.Login login)
         {
-            login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
-
-            
-
             if (ModelState.IsValid) //Model Valedierung ist korrekt (Email Format + Passwort)
-            {            
+            {
+                login.Passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(login.Passwort, "SHA1");
                 Benutzer check = DB.benutzerAuslesen(login.Email);
 
                 //schauen ob Emailadresse vorhanden
@@ -281,7 +279,9 @@ namespace Login.Controllers
                             FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
                         }
 
-                        return RedirectToAction("index", "User");
+                        string returnUrl = Url.Action("Index", "User");
+                        ViewBag.returnUrl = returnUrl;
+                        return PartialView("_Login", login);
 
                     }
                     else
@@ -290,12 +290,12 @@ namespace Login.Controllers
                         ModelState.AddModelError("", "Passwort falsch");
                     }
                 }
-                
-
-
             }
-            return View("index");
+
+            return PartialView("_Login", login);
         }
+
+
 
 
         /// <summary>
@@ -308,6 +308,5 @@ namespace Login.Controllers
             FormsAuthentication.SignOut();//Auth-Cookie wird gelöscht
             return RedirectToAction("Index", "User");
         }
-
     }
 }

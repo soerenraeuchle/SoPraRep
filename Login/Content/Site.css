@@ -1,3 +1,9 @@
+.uebersichtColumn
+{
+    width: 200px;
+    text-align: left;
+}
+
 #logo
 {
     position: absolute;

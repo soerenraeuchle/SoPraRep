@@ -11,6 +11,9 @@ namespace Login.Models
     /// <summary>
     /// Die Klasse Stellenangebote repräsentiert die Tabelle "Stellenangebote" in der Datenbank
     /// </summary>
+    /// 
+    [StartVorEnde(ErrorMessage = "Begin der Anstellung muss vor dem Ende sein")]
+    [BewerbungsFristVorStart(ErrorMessage = "Die Bewerbungsfrist muss vor dem Begin der Anstellung enden")]
     public class Stellenangebot
     {
 
@@ -79,6 +82,7 @@ namespace Login.Models
         [Required]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public  DateTime startAnstellung { get; set; }
+        
 
         [Required]
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
@@ -88,9 +92,29 @@ namespace Login.Models
         [DisplayFormat(ApplyFormatInEditMode = true, DataFormatString = "{0:dd/MM/yyyy}")]
         public DateTime bewerbungsFrist { get; set; }
 
-        
 
-        
+
+        [AttributeUsage(AttributeTargets.Class)]
+        public class StartVorEnde : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                var model = (Stellenangebot)value;
+                return model.startAnstellung < model.endeAnstellung;
+            }
+        }
+
+        [AttributeUsage(AttributeTargets.Class)]
+        public class BewerbungsFristVorStart : ValidationAttribute
+        {
+            public override bool IsValid(object value)
+            {
+                var model = (Stellenangebot)value;
+                return model.bewerbungsFrist < model.startAnstellung;
+            }
+        }
+
+
 
         
 
