@@ -86,6 +86,55 @@ namespace Login.Models
         //-------------------------------------------Benutzer Datenbank Methoden--------------------------------------------------
         //------------------------------------------------------------------------------------------------------------------------
 
+        public Admin adminAuslesen(String email)
+        {
+            Admin benutzer = new Admin();
+            string query = "SELECT vorname, nachname, rechte, passwort, id FROM Benutzer WHERE email=@email";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@email", email);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+
+                if (reader.HasRows)
+                {
+
+                    reader.Read();
+
+                    //Anbieter auslesen
+                    benutzer.vorname = reader.GetString(0);
+                    benutzer.nachname = reader.GetString(1);
+                    benutzer.rechte = reader.GetInt32(2);
+                    benutzer.passwort = reader.GetString(3);
+                    benutzer.confirmPasswort = benutzer.passwort;
+                    benutzer.id = reader.GetInt32(4);
+                    benutzer.email = email;
+
+                    reader.Close();
+                    disconnect();
+                    return benutzer;
+                }
+                else
+                {
+                    reader.Close();
+                    disconnect();
+                    return benutzer;
+                }
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return null;
+            }
+        }
+
+       
+
         public Benutzer benutzerAuslesen(String email)
         {
             Benutzer benutzer = new Benutzer();
@@ -385,7 +434,11 @@ namespace Login.Models
 
 
         //---------------------------------------- Anbieter ------------------------------------------------------
-
+        /// <summary>
+        /// Speichert einen neuen Anbieter in der Datenbank.
+        /// </summary>
+        /// <param name="benutzer">Der neue Anbieter.</param>
+        /// <returns>Gibt true zurück, falls kein Fehler auftrat, andernfalls false.</returns>
         public bool anbieterSpeichern(Anbieter benutzer)
         {
             benutzer.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(benutzer.passwort, "SHA1");
@@ -450,7 +503,7 @@ namespace Login.Models
         public Anbieter anbieterAuslesen(String email)
         {
             Anbieter benutzer = new Anbieter();
-            string query = "SELECT vorname, nachname, institut, passwort, id FROM Benutzer WHERE email=@email";
+            string query = "SELECT vorname, nachname, institut, stellvertreterID, passwort, id FROM Benutzer WHERE email=@email";
 
             try
             {
@@ -466,11 +519,12 @@ namespace Login.Models
                     benutzer.vorname = reader.GetString(0);
                     benutzer.nachname = reader.GetString(1);
                     benutzer.institut = reader.GetString(2);
+                    benutzer.stellvertreterID = reader.GetInt32(3);
 
-                    benutzer.passwort = reader.GetString(3);
+                    benutzer.passwort = reader.GetString(4);
                     benutzer.confirmPasswort = benutzer.passwort;
 
-                    benutzer.id = reader.GetInt32(4);
+                    benutzer.id = reader.GetInt32(5);
 
                     benutzer.email = email;
 
@@ -493,7 +547,8 @@ namespace Login.Models
             string query = "UPDATE Benutzer SET " +
                                 "vorname=@vorname, " +
                                 "nachname=@nachname, " +
-                                "institut=@institut " +
+                                "institut=@institut, " +
+                                "stellvertreterID=@stellvertreterID " +
                             "WHERE email=@email";
 
             try
@@ -504,6 +559,7 @@ namespace Login.Models
                 cmd.Parameters.AddWithValue("@nachname", benutzer.nachname);
 
                 cmd.Parameters.AddWithValue("@institut", benutzer.institut);
+                cmd.Parameters.AddWithValue("@stellvertreterID", benutzer.stellvertreterID);
 
                 cmd.Parameters.AddWithValue("@email", benutzer.email);
 
@@ -520,6 +576,380 @@ namespace Login.Models
             }
         }
 
+
+        //---------------------------------------- Bearbeiter ------------------------------------------------------
+
+        /// <summary>
+        /// Speichert einen neuen Anbieter in der Datenbank.
+        /// </summary>
+        /// <param name="benutzer">Der neue Anbieter.</param>
+        /// <returns>Gibt true zurück, falls kein Fehler auftrat, andernfalls false.</returns>
+        public bool bearbeiterSpeichern(Bearbeiter benutzer)
+        {
+            benutzer.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(benutzer.passwort, "SHA1");
+
+            string query = "INSERT INTO " +
+                                "Benutzer " +
+                                    "(" +
+                                        "vorname, " +
+                                        "nachname, " +
+
+                                        "email, " +
+                                        "passwort, " +
+
+                                        "rechte, " +
+                                        "freischaltung" +
+                                    ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "@vorname, " +
+                                        "@nachname, " +
+
+                                        "@email, " +
+                                        "@passwort, " +
+
+                                        "@rechte, " +
+                                        "@freischaltung" +
+                                    ")";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@vorname", benutzer.vorname);
+                cmd.Parameters.AddWithValue("@nachname", benutzer.nachname);
+                cmd.Parameters.AddWithValue("@email", benutzer.email);
+                cmd.Parameters.AddWithValue("@passwort", benutzer.passwort);
+                cmd.Parameters.AddWithValue("@rechte", benutzer.rechte);
+                cmd.Parameters.AddWithValue("@freischaltung", benutzer.freischaltung);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+        public Bearbeiter bearbeiterAuslesen(String email)
+        {
+            Bearbeiter benutzer = new Bearbeiter();
+            string query = "SELECT vorname, nachname, passwort, id FROM Benutzer WHERE email=@email";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@email", email);
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                reader.Read();
+
+                benutzer.vorname = reader.GetString(0);
+                benutzer.nachname = reader.GetString(1);
+
+                benutzer.passwort = reader.GetString(2);
+                benutzer.confirmPasswort = benutzer.passwort;
+
+                benutzer.id = reader.GetInt32(3);
+
+                benutzer.email = email;
+
+                reader.Close();
+
+                disconnect();
+                return benutzer;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return null;
+            }
+        }
+       
+
+
+        public bool bearbeiterAktualisieren(Bearbeiter benutzer)
+        {
+            string query = "UPDATE Benutzer SET " +
+                                "vorname=@vorname, " +
+                                "nachname=@nachname " +
+                            "WHERE email=@email";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+                cmd.Parameters.AddWithValue("@vorname", benutzer.vorname);
+                cmd.Parameters.AddWithValue("@nachname", benutzer.nachname);
+
+                cmd.Parameters.AddWithValue("@email", benutzer.email);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+
+        //--------------------------------------------------------------------------------------------------------------------
+        //--------------------------------------------- ADMIN ----------------------------------------------------------------
+        //--------------------------------------------------------------------------------------------------------------------
+
+        public bool adminAnlegen(Admin benutzer)
+        {
+            benutzer.passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(benutzer.passwort, "SHA1");
+
+            string query = "INSERT INTO " +
+                                "Benutzer " +
+                                    "(" +
+                                        "vorname, " +
+                                        "nachname, " +
+                                    
+                                        "email, " +
+                                        "passwort, " +
+
+                                        "rechte, " +
+                                        "freischaltung" +
+                                    ") " +
+                                "VALUES " +
+                                    "(" +
+                                        "@vorname, " +
+                                        "@nachname, " +
+
+                                        "@email, " +
+                                        "@passwort, " +
+
+                                        "@rechte, " +
+                                        "@freischaltung " +
+                                    ")";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                cmd.Parameters.AddWithValue("@vorname", benutzer.vorname);
+                cmd.Parameters.AddWithValue("@nachname", benutzer.nachname);
+
+                cmd.Parameters.AddWithValue("@email", benutzer.email);
+                cmd.Parameters.AddWithValue("@passwort", benutzer.passwort);
+                cmd.Parameters.AddWithValue("@rechte", benutzer.rechte);
+                cmd.Parameters.AddWithValue("@freischaltung", benutzer.freischaltung);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+        public bool benutzerLoeschen(int benutzerID)
+        {
+            string query = "DELETE FROM benutzer WHERE id=@id";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                cmd.Parameters.AddWithValue("@id", benutzerID);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+
+        public bool benutzerFreischalten(int benutzerID)
+        {
+            string query = "UPDATE benutzer SET freischaltung='True' WHERE id=@id";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                cmd.Parameters.AddWithValue("@id", benutzerID);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+
+        public bool benutzerSperren(int benutzerID)
+        {
+            string query = "UPDATE benutzer SET freischaltung='False' WHERE id=@id";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                cmd.Parameters.AddWithValue("@id", benutzerID);
+
+                connect();
+                cmd.ExecuteNonQuery();
+                disconnect();
+                return true;
+            }
+            catch (SqlException e)
+            {
+                lastError = e.StackTrace;
+                Console.WriteLine(e.StackTrace);
+                return false;
+            }
+        }
+
+
+        public LinkedList<Benutzer> benutzerAuslesen()
+        {
+            LinkedList<Benutzer> benutzerList = new LinkedList<Benutzer>();
+
+            string query = "SELECT id, vorname, nachname, email, studiengang, fachsemester, strasse, hausnummer, plz, wohnort, passwort, rechte, freischaltung, matrikelnummer, institut, stellvertreterID " +
+                            "FROM Benutzer ORDER BY nachname ASC, vorname ASC";
+
+            try
+            {
+                SqlCommand cmd = new SqlCommand(query, con);
+                cmd.Prepare();
+
+                connect();
+                SqlDataReader reader = cmd.ExecuteReader();
+                if (reader.HasRows)
+                {
+                    while (reader.Read())
+                    {
+                        int rechte = reader.GetInt32(11);
+
+                        //Benutzer je nach Rolle einteilen.
+                        if (rechte == 1)
+                        {
+                            //Anbieter
+                            Anbieter benutzer = new Anbieter();
+
+                            benutzer.id = reader.GetInt32(0);
+                            benutzer.vorname = reader.GetString(1);
+                            benutzer.nachname = reader.GetString(2);
+                            benutzer.email = reader.GetString(3);
+                            benutzer.passwort = reader.GetString(10);
+                            benutzer.confirmPasswort = benutzer.passwort;
+                            benutzer.rechte = rechte;
+                            benutzer.freischaltung = reader.GetBoolean(12);
+
+                            benutzer.institut = reader.GetString(14);
+                            benutzer.stellvertreterID = reader.GetInt32(15);
+
+                            benutzerList.AddLast(benutzer);
+                        }
+                        else if (rechte == 2)
+                        {
+                            //Bearbeiter
+                            Bearbeiter benutzer = new Bearbeiter();
+
+                            benutzer.id = reader.GetInt32(0);
+                            benutzer.vorname = reader.GetString(1);
+                            benutzer.nachname = reader.GetString(2);
+                            benutzer.email = reader.GetString(3);
+                            benutzer.passwort = reader.GetString(10);
+                            benutzer.confirmPasswort = benutzer.passwort;
+                            benutzer.rechte = rechte;
+                            benutzer.freischaltung = reader.GetBoolean(12);
+
+                            benutzerList.AddLast(benutzer);
+                        }
+                        else if (rechte == 3)
+                        {
+                            //Admin
+                            Admin benutzer = new Admin();
+
+                            benutzer.id = reader.GetInt32(0);
+                            benutzer.vorname = reader.GetString(1);
+                            benutzer.nachname = reader.GetString(2);
+                            benutzer.email = reader.GetString(3);
+                            benutzer.passwort = reader.GetString(10);
+                            benutzer.confirmPasswort = benutzer.passwort;
+                            benutzer.rechte = rechte;
+                            benutzer.freischaltung = reader.GetBoolean(12);
+
+                            benutzerList.AddLast(benutzer);
+                        }
+                        else
+                        {
+                            //Bewerber
+                            Bewerber benutzer = new Bewerber();
+
+                            benutzer.id = reader.GetInt32(0);
+                            benutzer.vorname = reader.GetString(1);
+                            benutzer.nachname = reader.GetString(2);
+                            benutzer.email = reader.GetString(3);
+                            benutzer.passwort = reader.GetString(10);
+                            benutzer.confirmPasswort = benutzer.passwort;
+                            benutzer.rechte = rechte;
+                            benutzer.freischaltung = reader.GetBoolean(12);
+
+                            benutzer.strasse = reader.GetString(6);
+                            benutzer.hausnummer = reader.GetString(7);
+                            benutzer.plz = reader.GetInt32(8);
+                            benutzer.wohnort = reader.GetString(9);
+
+                            benutzer.matrikelnummer = reader.GetInt32(13);
+                            benutzer.fachsemester = reader.GetInt32(5);
+                            benutzer.studiengang = reader.GetString(4);
+
+                            benutzerList.AddLast(benutzer);
+                        }
+
+                    }
+
+                }
+
+                reader.Close();
+                disconnect();
+                return benutzerList;
+            }
+            catch (SqlException e)
+            {
+                return null;
+            }
+        }
 
 
         //--------------------------------------------------------------------------------------------------------------------
@@ -633,7 +1063,7 @@ namespace Login.Models
             }
         }
 
-        public bool stellenangebotLoeschen(Stellenangebot stelle){
+        public bool stellenangebotLoeschen(Stellenangebot stelle) {
             string query = "DELETE FROM Stellenangebote " +
                             "WHERE id = @id";
             try

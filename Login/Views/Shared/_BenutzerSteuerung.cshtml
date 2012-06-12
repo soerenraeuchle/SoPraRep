@@ -1,19 +1,57 @@
-@{
-    var Stunde = @DateTime.Now.Hour;
-    var Begrüßung = "";
-    if(Stunde <= 11  && Stunde >= 5){
-        Begrüßung = "Guten Morgen";
-    }
-    else if(Stunde >= 12 && Stunde <= 20)
+<script type="text/javascript">
+    $(document).ready(function () {
+
+        
+
+        $("ul.topnav").click(function () {
+            $('ul.subnav').slideToggle('fast', function () {
+                // Animation complete.
+            });
+        });
+
+    });  
+</script>
+<style type="text/css">
+    .top 
     {
-       Begrüßung = "Wilkommen";
-    } else
-    {
-        Begrüßung = "Guten Abend";
+        color: #fefefe;
+        font-size: 14px;
+        padding: 10px;
+        background-color: #232323;
     }
+li 
+{   
+    padding: 5px;
 }
-<div class="login">
-@Begrüßung @HttpContext.Current.User.Identity.Name
+ul 
+{
+    list-style: none;
+    margin: 0;
+    padding: 0;
+}
+.subnav 
+{
+    display: none;
+    padding-left: 10px;
+}
+</style>
+<div id="login">
+<div class="konto">
+<div id="kontoMenu">
+     
+<ul class="topnav">
+    <li class="top"><span class="user">@HttpContext.Current.User.Identity.Name</span>
+    <ul class="subnav">
+        <li>@Html.ActionLink("Mein Konto", "Konto", "User")</li>
+        <li>@Html.ActionLink("Mein Konto bearbeiten", "KontoBearbeiten", "User")</li>
+    </ul>
+    </li>
+    
+
+</ul>
+</div>
+
+</div>
 
 
 

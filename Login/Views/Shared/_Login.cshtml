@@ -3,7 +3,7 @@
 @{ 
     Layout = "";
 } 
-<div class="login">
+<div id="login">
     <h2>Login</h2>
     <script src="@Url.Content("~/Scripts/jquery.validate.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery.validate.unobtrusive.min.js")" type="text/javascript"></script>
@@ -22,7 +22,7 @@
                 open: function(event, ui) {
                     //Load the CreateAlbumPartial action which will return 
                     // the partial view _CreateAlbumPartial
-                    $(this).load("@Url.Action("Register")");
+                    $(this).load("/User/Register");
                 }          
             });
 

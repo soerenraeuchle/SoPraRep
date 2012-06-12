@@ -1,0 +1,82 @@
+﻿@model Login.Models.BenutzerUebersicht
+
+@{
+    ViewBag.Title = "Index";
+}
+
+
+
+@if(Model.benutzerList.Count != 0)
+{
+    <table id="benutzerListe" cellpadding="0" cellspacing="0">
+    <tr class="head">
+        <th class="vorname">Vorname</th>
+        <th class="nachname">Nachname</th>
+        <th class="email">Email</th>
+        <th class="rolle">Rolle</th>
+        <th class="freischaltung">Freischaltung</th>
+        <th class="buttons"></th>
+
+    </tr>
+    
+
+
+    @for (int i = 0; i < Model.benutzerList.Count; i++ )
+    {
+
+            
+            string cl="ungerade";
+            if (i%2 == 0) { cl="gerade"; }
+
+            //Benutzerrolle
+            string rolle="Bewerber";
+
+            if (Model.benutzerList.ElementAt(i).rechte == 1) { rolle = "Anbieter"; }
+            if (Model.benutzerList.ElementAt(i).rechte == 2) { rolle = "Bearbeiter"; }
+            if (Model.benutzerList.ElementAt(i).rechte == 3) { rolle = "Admin"; }
+
+        
+            //Benutzer freigeschaltet?
+            string freischaltung = "gesperrt";
+
+            if (Model.benutzerList.ElementAt(i).freischaltung == true) { freischaltung = "freigeschaltet"; }
+             
+            <tr class="@cl">
+            <td class="vorname">@Model.benutzerList.ElementAt(i).vorname</td>
+            <td class="nachname">@Model.benutzerList.ElementAt(i).nachname</td>
+            <td class="email">@Model.benutzerList.ElementAt(i).email</td> 
+            <td class="rolle">@rolle</td>  
+            <td class="freischaltung">@freischaltung</td>  
+            <td class="buttons">
+            @using (Html.BeginForm("BenutzerLoeschen", "Admin", new { benutzerID = Model.benutzerList.ElementAt(i).id }))
+            {
+                <input type="submit" value="löschen" />
+            }
+            @if (freischaltung == "gesperrt")
+            {
+                using (Html.BeginForm("BenutzerFreischalten", "Admin", new { benutzerID = Model.benutzerList.ElementAt(i).id }))
+                {
+                    <input type="submit" value="freischalten" />
+                }
+            }
+            else
+            {
+                using (Html.BeginForm("BenutzerSperren", "Admin", new { benutzerID = Model.benutzerList.ElementAt(i).id }))
+                {
+                    <input type="submit" value="sperren" />
+                }
+            }
+            </td> 
+            </tr>
+                
+        
+                                                                                                  
+    }
+    </table>
+}
+else
+{
+    <div>Es sind noch keine Benutzer registriert.</div>   
+}
+
+   

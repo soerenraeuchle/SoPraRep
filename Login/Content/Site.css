@@ -1,7 +1,40 @@
+h1, h2, h3, h4, h5 
+{
+    margin: 0;
+}
+
+a 
+{
+    display: inline-block;
+}
+
+
+
 #logo
 {
     position: absolute;
     right: 0;
+}
+
+input {
+    padding: 5px;
+    background-color: #efefef;
+    border: 1px solid #ccc;
+}
+
+input:focus {
+    background-color: #fff;
+}
+
+input[type="submit"], .ui-button 
+{
+    cursor: pointer;
+    border-radius: 0px;
+    padding: 5px;
+    font-size: 14px;
+    min-width: 50px;
+    background: #fff;
+    box-shadow: inset 0 1px rgba(255,255,255,0.75), inset 0 10px 20px rgba(255,255,255,0.5), inset 0 -15px 30px rgba(0,0,0,0.1);
 }
 
 input[type=text], input[type=password] 
@@ -27,39 +60,34 @@ input[type=text], input[type=password]
     border: 1px solid #000; 
 }
 
-.page
+#page
 {
     margin-left: auto;
     margin-right:auto;
-    width: 100%;
+    width: 1190px;
 }
 
-.login
+#login
 {
-    padding: 5%;
-    width: 90%;
+    padding: 2px 0 0 2px;
 }
 
-.header
-{
-    position: relative;
-    height: 50px;
-    width: 100%;
-}
 
-.sidebar
+
+#sidebar
 {
     float: right;
     width: 300px;
 }
 
-.content
+#content
 {
+    padding: 2px 0;
     min-height: 500px;
     margin-right: 300px;
 }
 
-.footer
+#footer
 {
     width: 100%;
     clear: both;
@@ -82,6 +110,47 @@ section {
     display: block;
 }
 
+
+/*
+ * Header Styles
+----------------------------------------------------------*/
+#header
+{
+    color: #fefefe;
+    position: relative;
+    height: 150px;
+    width: 100%;
+    background-color: #232323;
+    
+}
+
+#header h1 
+{
+    padding: 40px 10px;
+}
+
+nav 
+{
+    position: absolute;
+    bottom: 0;
+    width: 100%;
+    background-color: #666;
+}
+
+nav a 
+{
+    cursor: pointer;
+    padding: 10px;
+    text-decoration: none;
+    color: #000;
+}
+
+nav a:hover 
+{
+    color: #fff;
+}
+
+
 /*
  * Style for Register Formular
 ----------------------------------------------------------*/
@@ -100,10 +169,43 @@ a.ui-dialog-titlebar-close
     padding: 0 10px;
     text-decoration: none;
 }
+
+/*
+ * Style für Admin
+-----------------------------------------------------------*/
+
+/* Benutzeruebersicht */
+#benutzerListe 
+{
+    width: 100%;
+    border: 0px;
+}
+
+#benutzerListe th 
+{
+    background-color: #232323;
+    color: #fefefe;
+    padding: 10px;
+    border-bottom: 1px solid #666;
+}
+
+#benutzerListe td 
+{
+    padding: 10px;
+    border-bottom: 1px solid #666;
+}
+
+#benutzerListe .ungerade 
+{
+    background-color: #eee;
+}
+
+
+
 /*
  * Style for Stellenangebot
 -----------------------------------------------------------*/
-.content h2 
+#content h2 
 {
     background-color: #232323;
     color: #EEEEEE;
@@ -143,12 +245,6 @@ a.ui-dialog-titlebar-close
 /*
  * Style for Konto
 -----------------------------------------------------------*/
-.content h2 
-{
-    background-color: #232323;
-    color: #EEEEEE;
-    padding: 20px;
-}
 
 #kontoMain .input 
 {

@@ -1,0 +1,22 @@
+﻿@model Login.Models.StellenangebotUebersicht
+
+
+@{
+    ViewBag.Title = "StellenangeboteAuslesen";
+    
+}
+
+<h2>StellenangeboteAuslesen</h2>
+
+@{
+    IEnumerable<Login.Models.Stellenangebot> gridModel = (IEnumerable<Login.Models.Stellenangebot>)Model.angebote;
+    WebGrid grid = new WebGrid(
+        gridModel, 
+        defaultSort: "stellenName"
+    );
+
+}
+
+@grid.GetHtml(
+    htmlAttributes: new { id = "grid" }
+);

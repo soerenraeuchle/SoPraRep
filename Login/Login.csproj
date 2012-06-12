@@ -72,12 +72,15 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="App_Start\RegisterClientValidationExtensions.cs" />
+    <Compile Include="Controllers\AdminController.cs" />
     <Compile Include="Controllers\AngeboteManagerController.cs" />
+    <Compile Include="Controllers\FileController.cs" />
     <Compile Include="Controllers\UserController.cs" />
     <Compile Include="Global.asax.cs">
       <DependentUpon>Global.asax</DependentUpon>
     </Compile>
     <Compile Include="Models\Benutzer.cs" />
+    <Compile Include="Models\BenutzerUebersicht.cs" />
     <Compile Include="Models\Bewerbung.cs" />
     <Compile Include="Models\DBManager.cs" />
     <Compile Include="Models\Security\HiwiBoerseRoleProvider.cs" />
@@ -217,11 +220,20 @@
     <Content Include="Views\AngeboteManager\_StellenAngebotSteuerung.cshtml" />
   </ItemGroup>
   <ItemGroup>
+    <Content Include="Views\Admin\Index.cshtml" />
+    <Content Include="Views\Admin\StellenangeboteAuslesen.cshtml" />
     <None Include="Views\AngeboteManager\StellenangebotBearbeiten.cshtml">
       <SubType>Code</SubType>
     </None>
     <Content Include="Views\User\Index.cshtml" />
     <Content Include="Views\Shared\_Stellenangebote.cshtml" />
+    <Content Include="Views\User\_RegisterBearbeiter.cshtml" />
+    <Content Include="Views\User\KontoBearbeiterBearbeiten.cshtml" />
+    <Content Include="Views\User\KontoBearbeiter.cshtml" />
+    <Content Include="Views\File\Index.cshtml" />
+  </ItemGroup>
+  <ItemGroup>
+    <WCFMetadata Include="Service References\" />
   </ItemGroup>
   <Import Project="$(MSBuildBinPath)\Microsoft.CSharp.targets" />
   <Import Project="$(MSBuildExtensionsPath32)\Microsoft\VisualStudio\v10.0\WebApplications\Microsoft.WebApplication.targets" />

@@ -43,15 +43,15 @@ namespace Login.Controllers
         /// Fügt einen Bewerber der Datenbank hinzu und startet eine Session.
         /// öffnet die Hauptseite
         /// </summary>
-        /// <param name="model">Register model</param>
+        /// <param name="model">Der neue Bewerber</param>
         /// <returns>Index.cshtml</returns>
+        [HttpPost]
         public ActionResult RegisterBewerber(Bewerber model)
         {
             if (ModelState.IsValid)
             {
                 if (model.rechte == 0) //Registrierung als Admin nicht zulassen.
                 {
-                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
                     
                     if (DB.bewerberSpeichern(model))
                     {
@@ -66,16 +66,34 @@ namespace Login.Controllers
             return RedirectToAction("index");
         }
 
-
+        [HttpPost]
         public ActionResult RegisterAnbieter(Anbieter model)
         {
             if (ModelState.IsValid)
             {
-                if (model.rechte != 3)
+                if (model.rechte == 1)
                 {
-                    string passwort = FormsAuthentication.HashPasswordForStoringInConfigFile(model.passwort, "SHA1");
 
                     if (DB.anbieterSpeichern(model))
+                    {
+                        FormsAuthentication.SetAuthCookie(model.email, false);
+                    }
+
+                }
+            }
+
+            return RedirectToAction("Index");
+        }
+
+        [HttpPost]
+        public ActionResult RegisterBearbeiter(Bearbeiter model)
+        {
+            if (ModelState.IsValid)
+            {
+                if (model.rechte == 2)
+                {
+
+                    if (DB.bearbeiterSpeichern(model))
                     {
                         FormsAuthentication.SetAuthCookie(model.email, false);
                     }
@@ -104,10 +122,19 @@ namespace Login.Controllers
                 Bewerber bewerber = new Bewerber();
                 return PartialView("_RegisterBewerber", bewerber);
             }
-            else
+            else if (rechte == 1)
             {
                 Anbieter anbieter = new Anbieter();
                 return PartialView("_RegisterAnbieter", anbieter);
+            }
+            else if (rechte == 2)
+            {
+                Bearbeiter bearbeiter = new Bearbeiter();
+                return PartialView("_RegisterBearbeiter", bearbeiter);
+            }
+            else
+            {
+                return View("Index");
             }
         }
 
@@ -156,6 +183,15 @@ namespace Login.Controllers
                     return View("KontoAnbieter", benutzer);
                 }
             }
+            //BearbeiterKonto
+            if (Roles.GetRolesForUser(email)[0].Equals("Bearbeiter"))
+            {
+                Bearbeiter benutzer = DB.bearbeiterAuslesen(email);
+                if (ModelState.IsValid)
+                {
+                    return View("KontoBearbeiter", benutzer);
+                }
+            }
             return View("Index");
 
         }
@@ -176,6 +212,12 @@ namespace Login.Controllers
             if (Roles.GetRolesForUser(email)[0].Equals("Anbieter"))
             {
                 return RedirectToAction("KontoAnbieterBearbeiten");
+            }
+
+            //Bearbeiter
+            if (Roles.GetRolesForUser(email)[0].Equals("Bearbeiter"))
+            {
+                return RedirectToAction("KontoBearbeiterBearbeiten");
             }
 
             return View("Fehler");
@@ -239,6 +281,26 @@ namespace Login.Controllers
             return RedirectToAction("Fehler");
         }
 
+        [Authorize(Roles = "Bearbeiter")]
+        public ActionResult KontoBearbeiterBearbeiten()
+        {
+            string email = HttpContext.User.Identity.Name;
+            Bearbeiter benutzer = DB.bearbeiterAuslesen(email);
+            return View(benutzer);
+        }
+
+        [HttpPost]
+        [Authorize(Roles = "Bearbeiter")]
+        public ActionResult KontoBearbeiterBearbeiten(Bearbeiter benutzer)
+        {
+            if (ModelState.IsValid)
+            {
+                DB.bearbeiterAktualisieren(benutzer);
+                return RedirectToAction("Konto");
+            }
+            return RedirectToAction("Fehler");
+        }
+
       
 
         /// <summary>
@@ -276,6 +338,19 @@ namespace Login.Controllers
                         {
                             Anbieter benutzer = DB.anbieterAuslesen(check.email);
                             FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Bearbeiter"))
+                        {
+                            Bearbeiter benutzer = DB.bearbeiterAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                        }
+
+                        if (Roles.GetRolesForUser(check.email)[0].Equals("Admin"))
+                        {
+                            Admin benutzer = DB.adminAuslesen(check.email);
+                            FormsAuthentication.SetAuthCookie(benutzer.email, false); //Auth-Cookie wird gesetzt, ab jetzt ist man Eingeloggt: False bedeutet: Wenn der Browser geschlossen wird so existiert das cookie auch nicht mehr
+                            return RedirectToAction("Index", "Admin");
                         }
                         return RedirectToAction("index", "user");
                     }

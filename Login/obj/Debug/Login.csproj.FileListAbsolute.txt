@@ -18,3 +18,13 @@ D:\SoPra\Login\bin\EntityFramework.xml
 D:\SoPra\Login\obj\Debug\ResolveAssemblyReference.cache
 D:\SoPra\Login\obj\Debug\Login.dll
 D:\SoPra\Login\obj\Debug\Login.pdb
+C:\dev\asp\SoPraRep\Login\bin\Login.dll
+C:\dev\asp\SoPraRep\Login\bin\Login.pdb
+C:\dev\asp\SoPraRep\Login\bin\DataAnnotationsExtensions.ClientValidation.dll
+C:\dev\asp\SoPraRep\Login\bin\DataAnnotationsExtensions.dll
+C:\dev\asp\SoPraRep\Login\bin\EntityFramework.dll
+C:\dev\asp\SoPraRep\Login\bin\WebActivator.dll
+C:\dev\asp\SoPraRep\Login\bin\EntityFramework.xml
+C:\dev\asp\SoPraRep\Login\obj\Debug\ResolveAssemblyReference.cache
+C:\dev\asp\SoPraRep\Login\obj\Debug\Login.dll
+C:\dev\asp\SoPraRep\Login\obj\Debug\Login.pdb

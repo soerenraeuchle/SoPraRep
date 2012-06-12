@@ -2,42 +2,56 @@
 <html>
 <head>
     <title>Hiwi Börse - @ViewBag.Title</title>
+    <link href="@Url.Content("~/Content/smoothness/jquery-ui-1.8.20.custom.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/Site.css")" rel="stylesheet" type="text/css" />
     <link href="@Url.Content("~/Content/register.css")" rel="stylesheet" type="text/css" />
-    <link href="@Url.Content("~/Content/smoothness/jquery-ui-1.8.20.custom.css")" rel="stylesheet" type="text/css" />
+    
     <script src="@Url.Content("~/Scripts/jquery-1.5.1.min.js")" type="text/javascript"></script>
     <script src="@Url.Content("~/Scripts/jquery-ui-1.8.11.min.js")" type="text/javascript"></script>
    
 </head>
 
 <body>
-<div class="page">
-<div class="header">
+<div id="page">
+<div id="header">
      <a href="@Url.Content("~")" id="logo">
     <img src="@Url.Content("~/Bilder/uulm_logo.gif")" /></a>
-</div>
-<div class="sidebar">
-     @{if(!Request.IsAuthenticated)
-      {
-          @Html.Partial("_Login", new Login.Models.Login())
-      }
-      else
-      {
-        @Html.Partial("_BenutzerSteuerung")
-        if(Roles.IsUserInRole("Anbieter"))
+    <h1>Hiwi Börse - Universität Ulm</h1>
+    <nav>
+    @if (Request.IsAuthenticated)
+    {
+        if (Roles.IsUserInRole("Admin"))
         {
-            @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
+            @Html.ActionLink("Stellenangebote", "Index", "Admin")
+            @Html.ActionLink("Bewerbungen", "Index", "Admin")
+            @Html.ActionLink("Anstellungen", "Index", "Admin")
+            @Html.ActionLink("Benutzer", "Index", "Admin")
         }
-      }
+    }
+    </nav>
+</div>
+<div id="sidebar">
+     @{if (!Request.IsAuthenticated)
+       {
+          @Html.Partial("_Login", new Login.Models.Login())
+       }
+       else
+       {
+        @Html.Partial("_BenutzerSteuerung")
+           if (Roles.IsUserInRole("Anbieter"))
+           {
+            @Html.Action("_StellenAngebotSteuerung", "AngeboteManager")
+           }
+       }
     }
     </div>
-<div class="content">
+<div id="content">
    
 
     @RenderBody()
     </div>
     
-    <div class="footer">footer</div>
+    <div id="footer">footer</div>
     </div>
 </body>
 </html>
